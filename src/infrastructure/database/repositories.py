@@ -1,6 +1,7 @@
 """Repository classes that map ORM records to domain models."""
 
 import json
+from datetime import datetime, timezone
 from typing import Any
 
 from sqlalchemy import func, select
@@ -275,8 +276,6 @@ class JobRepository:
         )
 
     def create(self, job: Job) -> Job:
-        from datetime import datetime, timezone
-
         record = JobRecord(
             source_file=job.source_file,
             preset_id=job.preset_id,
@@ -311,8 +310,6 @@ class JobRepository:
         return self._to_domain(record)
 
     def update_state(self, job_id: int, new_state: JobState) -> Job:
-        from datetime import datetime, timezone
-
         record = self._session.get(JobRecord, job_id)
         if record is None:
             raise ValueError(f"Job {job_id} not found")
@@ -339,11 +336,14 @@ class JobRepository:
         return self._to_domain(record)
 
     def mark_failed(self, job_id: int, error_message: str) -> Job:
-        from datetime import datetime, timezone
-
         record = self._session.get(JobRecord, job_id)
         if record is None:
             raise ValueError(f"Job {job_id} not found")
+        current = JobState(record.state)
+        if JobState.FAILED not in current.valid_transitions():
+            raise ValueError(
+                f"Cannot mark job as failed from terminal state: {current.value}"
+            )
         record.state = JobState.FAILED.value
         record.error_message = error_message
         record.completed_at = datetime.now(timezone.utc)

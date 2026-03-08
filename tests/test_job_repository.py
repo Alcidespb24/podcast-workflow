@@ -104,6 +104,16 @@ class TestJobRepository:
         states = {j.state for j in interrupted}
         assert states == {JobState.PROCESSING, JobState.ENCODING}
 
+    def test_mark_failed_rejects_terminal_state(self, session: Session):
+        repo = JobRepository(session)
+        j = repo.create(Job(source_file="note.md", preset_id=1))
+        repo.update_state(j.id, JobState.PROCESSING)
+        repo.update_state(j.id, JobState.ENCODING)
+        repo.update_state(j.id, JobState.PUBLISHING)
+        repo.update_state(j.id, JobState.COMPLETE)
+        with pytest.raises(ValueError, match="terminal state"):
+            repo.mark_failed(j.id, "too late")
+
     def test_get_by_source_file_pending(self, session: Session):
         repo = JobRepository(session)
         repo.create(Job(source_file="note.md", preset_id=1))
