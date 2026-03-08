@@ -1,6 +1,7 @@
 """FastAPI application factory for the podcast web server."""
 
 import os
+from collections.abc import Callable
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -12,7 +13,7 @@ from src.domain.models import Episode
 
 def create_app(
     settings: Settings,
-    get_episodes: callable = None,
+    get_episodes: Callable[[], list[Episode]] | None = None,
 ) -> FastAPI:
     """Create and configure the FastAPI application.
 

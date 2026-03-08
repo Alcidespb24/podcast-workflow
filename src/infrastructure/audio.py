@@ -6,14 +6,10 @@ Also retains the legacy ``write_wav`` helper for backward compatibility.
 from __future__ import annotations
 
 import wave
-from typing import TYPE_CHECKING
 
 from pydub import AudioSegment
 
 from src.exceptions import AudioWriteError, EncodingError
-
-if TYPE_CHECKING:
-    pass
 
 # ---------------------------------------------------------------------------
 # Ensure pydub can locate ffmpeg even when it is not on PATH.

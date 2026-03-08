@@ -13,7 +13,7 @@ from src.backend.google.tts import GoogleTTSClient
 from src.config import Settings
 from src.domain.models import Episode, PipelineConfig, sanitize_filename
 from src.domain.prompt_builder import build_script_prompt
-from src.exceptions import EncodingError, RSSError
+from src.exceptions import RSSError
 from src.infrastructure.audio import export_tagged_mp3, process_audio
 from src.infrastructure.chunker import chunk_script, normalize_speakers, validate_speakers
 from src.infrastructure.database.repositories import EpisodeRepository
@@ -152,7 +152,7 @@ def generate_podcast(
         filename=filename,
         duration_seconds=duration_seconds,
         file_size=file_size,
-        hosts=[h.name for h in config.hosts],
+        hosts=host_names,
         style_name=config.style.name,
         source_file=config.source_file,
         published_at=datetime.now(timezone.utc),
@@ -166,7 +166,7 @@ def generate_podcast(
         all_episodes = repo.get_all()
         feed_xml = build_podcast_feed(
             settings.podcast_name,
-            "Knowledge podcast",
+            f"{settings.podcast_name} - auto-generated podcast feed",
             settings.base_url,
             all_episodes,
         )
