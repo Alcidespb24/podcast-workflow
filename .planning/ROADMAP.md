@@ -80,11 +80,12 @@ Plans:
   2. User can assign host/style presets to vault folders through the web UI
   3. User can browse past episodes with status, metadata, and an in-browser audio player
   4. Dashboard is served via FastAPI with HTMX (no JS build step), protected by authentication, and bound to localhost by default
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md -- Dashboard foundation: auth, session dependency, app wiring, base template, sidebar, static assets
+- [ ] 04-02-PLAN.md -- Host and Style CRUD: modal forms, inline validation, delete confirmation, toast feedback
+- [ ] 04-03-PLAN.md -- Preset CRUD with dropdown selectors, episode/job history with status filtering and audio player
 
 ## Progress
 
@@ -96,4 +97,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Foundation and Pipeline Refactor | 5/5 | Complete | 2026-03-07 |
 | 2. Audio Processing and Distribution | 4/4 | Complete    | 2026-03-08 |
 | 3. Automation | 3/3 | Complete   | 2026-03-08 |
-| 4. Web Dashboard | 0/2 | Not started | - |
+| 4. Web Dashboard | 0/3 | Not started | - |

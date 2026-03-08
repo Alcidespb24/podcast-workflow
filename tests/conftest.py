@@ -1,10 +1,14 @@
+import base64
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 
+from src.backend.web.app import create_app
+from src.config import Settings
 from src.domain.models import Episode, Host, Style
 from src.infrastructure.database.models import Base
 
@@ -72,3 +76,38 @@ def tmp_env_file(tmp_path: Path) -> Path:
         "VAULT_OUTPUT_DIR=/tmp/vault\n"
     )
     return env_file
+
+
+@pytest.fixture()
+def dashboard_settings(tmp_path: Path) -> Settings:
+    """Settings configured for dashboard testing."""
+    ep_dir = tmp_path / "episodes"
+    ep_dir.mkdir()
+    return Settings(
+        google_api_key="test-key",
+        base_url="https://podcast.example.com",
+        vault_output_dir=str(tmp_path / "vault"),
+        episodes_dir=str(ep_dir),
+        podcast_name="Test Podcast",
+        dashboard_username="admin",
+        REDACTED_FIELD="testpass",
+    )
+
+
+@pytest.fixture()
+def session_factory(db_engine):
+    """Create a sessionmaker bound to the test database engine."""
+    return sessionmaker(bind=db_engine)
+
+
+@pytest.fixture()
+def dashboard_client(dashboard_settings: Settings, session_factory) -> TestClient:
+    """Create a TestClient with Basic Auth for dashboard testing."""
+    app = create_app(
+        settings=dashboard_settings,
+        session_factory=session_factory,
+    )
+    client = TestClient(app)
+    credentials = base64.b64encode(b"admin:testpass").decode("ascii")
+    client.headers["Authorization"] = f"Basic {credentials}"
+    return client

@@ -30,6 +30,11 @@ class Settings(BaseSettings):
     crossfade_ms: int = 30
     target_dbfs: float = -20.0
 
+    # Phase 4: Web Dashboard
+    dashboard_username: str = "admin"
+    REDACTED_FIELD: str = "REDACTED_VALUE"
+    dashboard_host: str = "127.0.0.1"
+
     # Phase 3: Automation
     watcher_enabled: bool = True
     watcher_debounce_seconds: float = 1.5

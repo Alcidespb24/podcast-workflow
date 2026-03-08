@@ -20,6 +20,7 @@ from src.infrastructure.database.models import (
 # Columns that are safe to update via the generic update() method.
 _HOST_MUTABLE_FIELDS = frozenset({"name", "voice", "role", "is_default"})
 _STYLE_MUTABLE_FIELDS = frozenset({"name", "tone", "personality_guidance", "is_default"})
+_PRESET_MUTABLE_FIELDS = frozenset({"folder_path", "host_a_id", "host_b_id", "style_id", "personality_guidance"})
 
 
 class HostRepository:
@@ -246,6 +247,18 @@ class PresetRepository:
         stmt = select(PresetRecord).order_by(PresetRecord.id)
         return [self._to_domain(r) for r in self._session.scalars(stmt)]
 
+    def update(self, preset_id: int, **fields: Any) -> Preset | None:
+        record = self._session.get(PresetRecord, preset_id)
+        if record is None:
+            return None
+        unknown = fields.keys() - _PRESET_MUTABLE_FIELDS
+        if unknown:
+            raise ValueError(f"Unknown Preset fields: {unknown}")
+        for key, value in fields.items():
+            setattr(record, key, value)
+        self._session.flush()
+        return self._to_domain(record)
+
     def delete(self, preset_id: int) -> bool:
         record = self._session.get(PresetRecord, preset_id)
         if record is None:
@@ -296,6 +309,12 @@ class JobRepository:
         if record is None:
             return None
         return self._to_domain(record)
+
+    def get_all(self, states: list[JobState] | None = None) -> list[Job]:
+        stmt = select(JobRecord).order_by(JobRecord.created_at.desc())
+        if states is not None:
+            stmt = stmt.where(JobRecord.state.in_([s.value for s in states]))
+        return [self._to_domain(r) for r in self._session.scalars(stmt)]
 
     def get_next_pending(self) -> Job | None:
         stmt = (
