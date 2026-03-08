@@ -1,2 +1,33 @@
-<h1>Styles</h1>
-<p>Style management will appear here.</p>
+<div id="style-list">
+    <header style="display:flex; justify-content:space-between; align-items:center;">
+        <h1>Styles</h1>
+        <button class="outline"
+                hx-get="/dashboard/styles/new"
+                hx-target="body"
+                hx-swap="beforeend">
+            + New Style
+        </button>
+    </header>
+
+    {% if styles %}
+    <figure>
+        <table role="grid">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Tone</th>
+                    <th>Personality Guidance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for style in styles %}
+                {% include "partials/styles/row.html" %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </figure>
+    {% else %}
+    <p>No styles configured yet. Create one to get started.</p>
+    {% endif %}
+</div>

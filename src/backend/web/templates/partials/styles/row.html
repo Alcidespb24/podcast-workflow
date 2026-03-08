@@ -1,0 +1,22 @@
+<tr>
+    <td>{{ style.name }}</td>
+    <td>{{ style.tone[:50] }}{% if style.tone|length > 50 %}...{% endif %}</td>
+    <td>{% if style.personality_guidance %}{{ style.personality_guidance[:50] }}{% if style.personality_guidance|length > 50 %}...{% endif %}{% else %}<em>None</em>{% endif %}</td>
+    <td>
+        <div role="group">
+            <button class="outline secondary"
+                    hx-get="/dashboard/styles/{{ style.id }}/edit"
+                    hx-target="body"
+                    hx-swap="beforeend">
+                Edit
+            </button>
+            <button class="outline secondary"
+                    hx-delete="/dashboard/styles/{{ style.id }}"
+                    hx-target="#style-list"
+                    hx-swap="innerHTML"
+                    hx-confirm="Delete style '{{ style.name }}'? This cannot be undone.">
+                Delete
+            </button>
+        </div>
+    </td>
+</tr>

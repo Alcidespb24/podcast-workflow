@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from src.backend.web.routes.api_hosts import router as hosts_router
 from src.backend.web.routes.api_presets import router as presets_router
+from src.backend.web.routes.api_styles import router as styles_router
 from src.backend.web.routes.dashboard import router as dashboard_router
 from src.backend.web.routes.dashboard import status_router
 from src.backend.web.routes.rss import router as rss_router
@@ -88,6 +89,7 @@ def create_app(
     # Include routers
     app.include_router(rss_router)
     app.include_router(hosts_router)
+    app.include_router(styles_router)
     app.include_router(presets_router)
     app.include_router(dashboard_router)
     app.include_router(status_router)

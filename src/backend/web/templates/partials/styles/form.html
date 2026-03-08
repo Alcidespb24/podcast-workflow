@@ -1,0 +1,59 @@
+<dialog open data-theme="dark">
+    <article>
+        <header>
+            <button aria-label="Close"
+                    rel="prev"
+                    onclick="this.closest('dialog').remove()"></button>
+            <h3>{% if action == 'edit' %}Edit Style{% else %}New Style{% endif %}</h3>
+        </header>
+        <form {% if action == 'edit' %}
+                  hx-put="/dashboard/styles/{{ style.id }}"
+              {% else %}
+                  hx-post="/dashboard/styles"
+              {% endif %}
+              hx-target="#style-list"
+              hx-swap="innerHTML">
+            <label for="style-name">
+                Name
+                <input type="text"
+                       id="style-name"
+                       name="name"
+                       value="{{ style.name if style else '' }}"
+                       placeholder="Style name"
+                       required>
+                {% if errors and 'name' in errors %}
+                <small class="error">{{ errors.name }}</small>
+                {% endif %}
+            </label>
+            <label for="style-tone">
+                Tone
+                <input type="text"
+                       id="style-tone"
+                       name="tone"
+                       value="{{ style.tone if style else '' }}"
+                       placeholder="e.g. Informative & engaging"
+                       required>
+                {% if errors and 'tone' in errors %}
+                <small class="error">{{ errors.tone }}</small>
+                {% endif %}
+            </label>
+            <label for="style-personality-guidance">
+                Personality Guidance <small>(optional)</small>
+                <textarea id="style-personality-guidance"
+                          name="personality_guidance"
+                          placeholder="Optional personality guidance for the hosts"
+                          rows="3">{{ style.personality_guidance if style and style.personality_guidance else '' }}</textarea>
+            </label>
+            <footer>
+                <button type="button"
+                        class="secondary"
+                        onclick="this.closest('dialog').remove()">
+                    Cancel
+                </button>
+                <button type="submit">
+                    {% if action == 'edit' %}Save Changes{% else %}Create Style{% endif %}
+                </button>
+            </footer>
+        </form>
+    </article>
+</dialog>
