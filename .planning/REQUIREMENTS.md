@@ -38,15 +38,15 @@
 
 ### Distribution
 
-- [ ] **DIST-01**: RSS feed generation with iTunes namespace tags via feedgen
-- [ ] **DIST-02**: MP3 hosting via FastAPI static file serving
+- [x] **DIST-01**: RSS feed generation with iTunes namespace tags via feedgen
+- [x] **DIST-02**: MP3 hosting via FastAPI static file serving
 - [x] **DIST-03**: Episode metadata (title, description, tags) in RSS feed
-- [ ] **DIST-04**: RSS feed validation before publishing
+- [x] **DIST-04**: RSS feed validation before publishing
 
 ### Obsidian Integration
 
-- [ ] **OBS-01**: MP3 audio file saved to configured Obsidian vault folder
-- [ ] **OBS-02**: Markdown note created with episode metadata, transcript, and link to audio
+- [x] **OBS-01**: MP3 audio file saved to configured Obsidian vault folder
+- [x] **OBS-02**: Markdown note created with episode metadata, transcript, and link to audio
 
 ### Web Dashboard
 
@@ -111,12 +111,12 @@
 | AUDIO-02 | Phase 2 | Complete |
 | AUDIO-03 | Phase 2 | Complete |
 | AUDIO-04 | Phase 2 | Complete |
-| DIST-01 | Phase 2 | Pending |
-| DIST-02 | Phase 2 | Pending |
+| DIST-01 | Phase 2 | Complete |
+| DIST-02 | Phase 2 | Complete |
 | DIST-03 | Phase 2 | Complete |
-| DIST-04 | Phase 2 | Pending |
-| OBS-01 | Phase 2 | Pending |
-| OBS-02 | Phase 2 | Pending |
+| DIST-04 | Phase 2 | Complete |
+| OBS-01 | Phase 2 | Complete |
+| OBS-02 | Phase 2 | Complete |
 | AUTO-01 | Phase 3 | Pending |
 | AUTO-02 | Phase 3 | Pending |
 | AUTO-03 | Phase 3 | Pending |

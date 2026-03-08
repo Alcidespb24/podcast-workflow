@@ -47,7 +47,7 @@ Plans:
   2. Pipeline outputs a properly tagged MP3 file (ID3: title, artist, episode number) at CBR 128kbps mono
   3. An RSS feed with iTunes namespace tags is generated, validates successfully, and is served via HTTP for Spotify ingestion
   4. MP3 file and a markdown note (with metadata, transcript, and audio link) are saved to the configured Obsidian vault folder
-**Plans:** 4 plans
+**Plans:** 3/4 plans executed
 
 Plans:
 - [x] 02-01-PLAN.md -- Episode model, DB persistence, config extension, dependency installation
@@ -93,6 +93,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation and Pipeline Refactor | 5/5 | Complete | 2026-03-07 |
-| 2. Audio Processing and Distribution | 2/4 | Executing | - |
+| 2. Audio Processing and Distribution | 3/4 | In Progress|  |
 | 3. Automation | 0/2 | Not started | - |
 | 4. Web Dashboard | 0/2 | Not started | - |
