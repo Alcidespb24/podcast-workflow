@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in-progress
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-03-08T13:43:34Z"
-last_activity: 2026-03-08 — Phase 3 Plan 3 executed (integration wiring)
+status: in_progress
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-08T22:26:44Z"
+last_activity: 2026-03-08 — Phase 4 Plan 1 executed (dashboard foundation)
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 12
-  completed_plans: 8
-  percent: 67
+  completed_plans: 10
+  percent: 83
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Knowledge notes automatically become listenable podcast episodes with configurable voices and styles
-**Current focus:** Phase 3 - Automation
+**Current focus:** Phase 4 - Web Dashboard
 
 ## Current Position
 
-Phase: 3 of 4 (Automation)
-Plan: 3 of 3 in current phase (done)
-Status: Phase 3 Complete
-Last activity: 2026-03-08 — Phase 3 Plan 3 executed (integration wiring)
+Phase: 4 of 4 (Web Dashboard)
+Plan: 1 of 3 in current phase
+Status: In Progress
+Last activity: 2026-03-08 — Phase 4 Plan 1 executed (dashboard foundation)
 
-Progress: [#######░░░] 67%
+Progress: [########░░] 83%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: ~3.5 min (Phase 2 only)
-- Total execution time: ~0.20 hours
+- Total plans completed: 10
+- Average duration: ~4.0 min
+- Total execution time: ~0.27 hours
 
 **By Phase:**
 
@@ -51,6 +51,7 @@ Progress: [#######░░░] 67%
 - Trend: Steady velocity
 
 *Updated after each plan completion*
+| Phase 04 P01 | 4min | 2 tasks | 16 files |
 | Phase 03 P03 | 5min | 2 tasks | 6 files |
 | Phase 03 P02 | 5 | 2 tasks | 6 files |
 | Phase 03 P01 | 5min | 2 tasks | 9 files |
@@ -84,6 +85,9 @@ Recent decisions affecting current work:
 - [03-03]: State transitions walk full path PROCESSING->ENCODING->PUBLISHING->COMPLETE (domain model enforces adjacency)
 - [03-03]: Fresh session per retry attempt to avoid stale SQLAlchemy state
 - [03-03]: TYPE_CHECKING guard for WatcherService import in app.py to prevent circular imports
+- [04-01]: Status endpoint manages own session instead of Depends(get_db) to handle None session_factory
+- [04-01]: Status endpoint has no auth -- accessed via HTMX polling from already-authenticated page
+- [04-01]: DRY _render_page helper with HX-Request header detection for partial vs full-page rendering
 
 ### Pending Todos
 
@@ -95,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-08T13:43:34Z
-Stopped at: Completed 03-03-PLAN.md (Phase 3 complete)
+Last session: 2026-03-08T22:26:44Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
