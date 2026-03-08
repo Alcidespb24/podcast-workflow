@@ -33,6 +33,10 @@ class TestMarkdownTables:
         text = "Before table.\n| Col1 | Col2 |\n| --- | --- |\n| a | b |\nAfter table."
         assert sanitize_markdown(text) == "Before table.\nAfter table."
 
+    def test_preserves_pipe_characters_in_prose(self) -> None:
+        text = "Use |pipe| symbols in normal text."
+        assert sanitize_markdown(text) == "Use |pipe| symbols in normal text."
+
 
 class TestWikiLinks:
     def test_converts_wiki_links_with_display(self) -> None:
