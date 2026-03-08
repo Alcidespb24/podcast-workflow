@@ -50,10 +50,10 @@
 
 ### Web Dashboard
 
-- [ ] **DASH-01**: Host CRUD — create, edit, delete podcast hosts via web UI
-- [ ] **DASH-02**: Style CRUD — create, edit, delete podcast styles via web UI
-- [ ] **DASH-03**: Folder preset mapping — assign host/style configs to vault folders
-- [ ] **DASH-04**: Job/episode history — view past episodes with status, audio player, metadata
+- [x] **DASH-01**: Host CRUD — create, edit, delete podcast hosts via web UI
+- [x] **DASH-02**: Style CRUD — create, edit, delete podcast styles via web UI
+- [x] **DASH-03**: Folder preset mapping — assign host/style configs to vault folders
+- [x] **DASH-04**: Job/episode history — view past episodes with status, audio player, metadata
 - [x] **DASH-05**: FastAPI + HTMX + Jinja2 stack (no JS build step)
 - [x] **DASH-06**: Authentication (at minimum HTTP Basic Auth, bind to 127.0.0.1 by default)
 
@@ -123,10 +123,10 @@
 | AUTO-04 | Phase 3 | Complete |
 | AUTO-05 | Phase 3 | Complete |
 | AUTO-06 | Phase 3 | Complete |
-| DASH-01 | Phase 4 | Pending |
-| DASH-02 | Phase 4 | Pending |
-| DASH-03 | Phase 4 | Pending |
-| DASH-04 | Phase 4 | Pending |
+| DASH-01 | Phase 4 | Complete |
+| DASH-02 | Phase 4 | Complete |
+| DASH-03 | Phase 4 | Complete |
+| DASH-04 | Phase 4 | Complete |
 | DASH-05 | Phase 4 | Complete |
 | DASH-06 | Phase 4 | Complete |
 

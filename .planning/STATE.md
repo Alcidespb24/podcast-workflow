@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in_progress
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-08T22:26:44Z"
-last_activity: 2026-03-08 — Phase 4 Plan 1 executed (dashboard foundation)
+status: complete
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-03-08T22:35:11Z"
+last_activity: 2026-03-08 — Phase 4 Plan 3 executed (preset CRUD + episode history)
 progress:
   total_phases: 4
-  completed_phases: 3
-  total_plans: 12
-  completed_plans: 10
-  percent: 83
+  completed_phases: 4
+  total_plans: 15
+  completed_plans: 15
+  percent: 100
 ---
 
 # Project State
@@ -26,16 +26,16 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 4 of 4 (Web Dashboard)
-Plan: 1 of 3 in current phase
-Status: In Progress
-Last activity: 2026-03-08 — Phase 4 Plan 1 executed (dashboard foundation)
+Plan: 3 of 3 in current phase
+Status: Complete
+Last activity: 2026-03-08 — Phase 4 Plan 3 executed (preset CRUD + episode history)
 
-Progress: [########░░] 83%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 15
 - Average duration: ~4.0 min
 - Total execution time: ~0.27 hours
 
@@ -51,6 +51,8 @@ Progress: [########░░] 83%
 - Trend: Steady velocity
 
 *Updated after each plan completion*
+| Phase 04 P03 | 5min | 2 tasks | 13 files |
+| Phase 04 P02 | 6min | 2 tasks | 13 files |
 | Phase 04 P01 | 4min | 2 tasks | 16 files |
 | Phase 03 P03 | 5min | 2 tasks | 6 files |
 | Phase 03 P02 | 5 | 2 tasks | 6 files |
@@ -88,6 +90,13 @@ Recent decisions affecting current work:
 - [04-01]: Status endpoint manages own session instead of Depends(get_db) to handle None session_factory
 - [04-01]: Status endpoint has no auth -- accessed via HTMX polling from already-authenticated page
 - [04-01]: DRY _render_page helper with HX-Request header detection for partial vs full-page rendering
+- [04-02]: Dashboard page endpoints query repositories via Depends(get_db) to pass entity lists to templates
+- [04-02]: conftest db_engine uses StaticPool + check_same_thread=False for cross-thread in-memory SQLite
+- [04-02]: Modal forms follow Pico CSS dialog pattern with hx-target on list container for seamless refresh
+- [04-03]: Combined episode+job view as unified display list sorted by date descending
+- [04-03]: Status filter via query parameter with HTMX partial swap on #episode-list
+- [04-03]: Preset form uses dialog with auto-close on hx-on::after-request
+- [04-03]: Date format uses %b %d (not %-d) for Windows cross-platform compatibility
 
 ### Pending Todos
 
@@ -99,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-08T22:26:44Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-03-08T22:35:11Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
