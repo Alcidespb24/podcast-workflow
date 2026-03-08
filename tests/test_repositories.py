@@ -89,6 +89,13 @@ def test_host_update(db_session: Session) -> None:
     assert updated.voice == "V2"
 
 
+def test_host_update_rejects_unknown_field(db_session: Session) -> None:
+    repo = HostRepository(db_session)
+    created = repo.create(Host(name="Safe", voice="V1", role="host"))
+    with pytest.raises(ValueError, match="Unknown Host fields"):
+        repo.update(created.id, nonexistent="bad")
+
+
 def test_host_delete(db_session: Session) -> None:
     repo = HostRepository(db_session)
     created = repo.create(Host(name="Doomed", voice="V1", role="host"))
@@ -143,6 +150,13 @@ def test_style_update(db_session: Session) -> None:
     updated = repo.update(created.id, tone="Exciting")
     assert updated is not None
     assert updated.tone == "Exciting"
+
+
+def test_style_update_rejects_unknown_field(db_session: Session) -> None:
+    repo = StyleRepository(db_session)
+    created = repo.create(Style(name="Safe", tone="OK"))
+    with pytest.raises(ValueError, match="Unknown Style fields"):
+        repo.update(created.id, nonexistent="bad")
 
 
 def test_style_delete(db_session: Session) -> None:

@@ -1,11 +1,17 @@
 """Repository classes that map ORM records to domain models."""
 
+from typing import Any
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.config import Settings
 from src.domain.models import Host, Style
 from src.infrastructure.database.models import HostRecord, StyleRecord
+
+# Columns that are safe to update via the generic update() method.
+_HOST_MUTABLE_FIELDS = frozenset({"name", "voice", "role", "is_default"})
+_STYLE_MUTABLE_FIELDS = frozenset({"name", "tone", "personality_guidance", "is_default"})
 
 
 class HostRepository:
@@ -47,13 +53,15 @@ class HostRepository:
         stmt = select(HostRecord).where(HostRecord.is_default.is_(True)).order_by(HostRecord.id)
         return [self._to_domain(r) for r in self._session.scalars(stmt)]
 
-    def update(self, host_id: int, **fields: object) -> Host | None:
+    def update(self, host_id: int, **fields: Any) -> Host | None:
         record = self._session.get(HostRecord, host_id)
         if record is None:
             return None
+        unknown = fields.keys() - _HOST_MUTABLE_FIELDS
+        if unknown:
+            raise ValueError(f"Unknown Host fields: {unknown}")
         for key, value in fields.items():
-            if hasattr(record, key):
-                setattr(record, key, value)
+            setattr(record, key, value)
         self._session.flush()
         return self._to_domain(record)
 
@@ -105,13 +113,15 @@ class StyleRepository:
         stmt = select(StyleRecord).where(StyleRecord.is_default.is_(True)).order_by(StyleRecord.id)
         return [self._to_domain(r) for r in self._session.scalars(stmt)]
 
-    def update(self, style_id: int, **fields: object) -> Style | None:
+    def update(self, style_id: int, **fields: Any) -> Style | None:
         record = self._session.get(StyleRecord, style_id)
         if record is None:
             return None
+        unknown = fields.keys() - _STYLE_MUTABLE_FIELDS
+        if unknown:
+            raise ValueError(f"Unknown Style fields: {unknown}")
         for key, value in fields.items():
-            if hasattr(record, key):
-                setattr(record, key, value)
+            setattr(record, key, value)
         self._session.flush()
         return self._to_domain(record)
 
