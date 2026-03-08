@@ -2,13 +2,13 @@
 
 import logging
 import sys
+from pathlib import Path
 
 from src.application.podcast_service import generate_podcast
 from src.config import Settings
 from src.domain.models import PipelineConfig
 from src.exceptions import AudioWriteError, ConfigurationError, InputError, PodcastError, ScriptGenerationError, TTSError
-from src.infrastructure.database import create_db_engine, get_session_factory
-from src.infrastructure.database.models import Base
+from src.infrastructure.database import create_db_engine, get_session_factory, run_migrations
 from src.infrastructure.database.repositories import HostRepository, StyleRepository, seed_defaults
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -26,8 +26,9 @@ def main() -> None:
         settings = Settings()
 
         # Database setup
+        Path("data").mkdir(exist_ok=True)
+        run_migrations(settings.database_url)
         engine = create_db_engine(settings.database_url)
-        Base.metadata.create_all(engine)
         session_factory = get_session_factory(engine)
 
         with session_factory() as session:

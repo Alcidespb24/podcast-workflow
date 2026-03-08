@@ -17,14 +17,16 @@ if config.config_file_name is not None:
 # MetaData for autogenerate support
 target_metadata = Base.metadata
 
-# Load database URL from Settings if available
-try:
-    from src.config import Settings
+# Load database URL from Settings only if not already set (e.g., by run_migrations)
+_url = config.get_main_option("sqlalchemy.url")
+if not _url:
+    try:
+        from src.config import Settings
 
-    _settings = Settings()  # type: ignore[call-arg]
-    config.set_main_option("sqlalchemy.url", _settings.database_url)
-except Exception:
-    pass
+        _settings = Settings()  # type: ignore[call-arg]
+        config.set_main_option("sqlalchemy.url", _settings.database_url)
+    except Exception:
+        pass
 
 
 def run_migrations_offline() -> None:
