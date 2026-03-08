@@ -21,11 +21,23 @@ from src.infrastructure.audio import (
 # Helpers
 # ---------------------------------------------------------------------------
 
-_HAS_FFMPEG = pydub_which("ffmpeg") is not None
+def _ffmpeg_available() -> bool:
+    """Return True if ffmpeg is available (system PATH or imageio-ffmpeg fallback)."""
+    if pydub_which("ffmpeg") is not None:
+        return True
+    try:
+        import imageio_ffmpeg
+        imageio_ffmpeg.get_ffmpeg_exe()
+        return True
+    except (ImportError, RuntimeError):
+        return False
+
+
+_HAS_FFMPEG = _ffmpeg_available()
 
 requires_ffmpeg = pytest.mark.skipif(
     not _HAS_FFMPEG,
-    reason="ffmpeg not on PATH — MP3 tests skipped",
+    reason="ffmpeg not available — MP3 tests skipped",
 )
 
 
