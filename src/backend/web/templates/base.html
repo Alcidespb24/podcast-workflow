@@ -4,15 +4,69 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Podcast Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='app.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
 </head>
 <body>
-<div class="dashboard-layout">
-    <aside class="sidebar">
-        <nav><ul><li>Episodes</li></ul></nav>
-    </aside>
-    <main id="main-content" class="container">
-        {% if content_template %}{% include content_template %}{% else %}{% block content %}{% endblock %}{% endif %}
-    </main>
-</div>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <nav>
+                <ul>
+                    <li>
+                        <a href="/dashboard/episodes"
+                           hx-get="/dashboard/episodes"
+                           hx-target="#main-content"
+                           hx-push-url="true"
+                           hx-swap="innerHTML"
+                           class="{{ 'active' if active_page == 'episodes' else '' }}">
+                            Episodes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/dashboard/hosts"
+                           hx-get="/dashboard/hosts"
+                           hx-target="#main-content"
+                           hx-push-url="true"
+                           hx-swap="innerHTML"
+                           class="{{ 'active' if active_page == 'hosts' else '' }}">
+                            Hosts
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/dashboard/styles"
+                           hx-get="/dashboard/styles"
+                           hx-target="#main-content"
+                           hx-push-url="true"
+                           hx-swap="innerHTML"
+                           class="{{ 'active' if active_page == 'styles' else '' }}">
+                            Styles
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/dashboard/presets"
+                           hx-get="/dashboard/presets"
+                           hx-target="#main-content"
+                           hx-push-url="true"
+                           hx-swap="innerHTML"
+                           class="{{ 'active' if active_page == 'presets' else '' }}">
+                            Presets
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div id="sidebar-status"
+                 hx-get="/dashboard/status"
+                 hx-trigger="every 30s"
+                 hx-swap="innerHTML">
+                {% include "partials/sidebar_status.html" %}
+            </div>
+        </aside>
+        <main id="main-content" class="container">
+            {% if content_template %}{% include content_template %}{% else %}{% block content %}{% endblock %}{% endif %}
+        </main>
+    </div>
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+    <script src="{{ url_for('static', path='app.js') }}"></script>
 </body>
 </html>

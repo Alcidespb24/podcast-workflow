@@ -13,6 +13,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from src.backend.web.routes.dashboard import router as dashboard_router
+from src.backend.web.routes.dashboard import status_router
 from src.backend.web.routes.rss import router as rss_router
 from src.config import Settings
 from src.domain.models import Episode
@@ -85,5 +86,6 @@ def create_app(
     # Include routers
     app.include_router(rss_router)
     app.include_router(dashboard_router)
+    app.include_router(status_router)
 
     return app

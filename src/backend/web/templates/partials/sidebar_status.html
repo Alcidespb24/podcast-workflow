@@ -1,0 +1,16 @@
+<small>
+    {% if watcher_running %}
+        <span style="color: #4caf50;">&#x25CF;</span> Watcher running
+    {% else %}
+        <span style="color: #f44336;">&#x25CF;</span> Watcher stopped
+    {% endif %}
+    <br>
+    {% if pending_count is defined and pending_count > 0 %}
+        {{ pending_count }} pending<br>
+    {% endif %}
+    {% if last_episode_time is defined and last_episode_time %}
+        Last: {{ last_episode_time }}
+    {% else %}
+        No episodes yet
+    {% endif %}
+</small>

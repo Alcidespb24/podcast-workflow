@@ -1,1 +1,92 @@
-/* placeholder */
+/* Dashboard layout */
+body > .dashboard-layout {
+    max-width: none;
+}
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem;
+    border-right: 1px solid var(--pico-muted-border-color);
+    background: var(--pico-card-background-color);
+}
+
+.sidebar nav a {
+    text-decoration: none;
+}
+
+.sidebar nav a.active {
+    color: var(--pico-primary);
+    font-weight: bold;
+}
+
+#sidebar-status {
+    padding-top: 1rem;
+    border-top: 1px solid var(--pico-muted-border-color);
+}
+
+/* Toast notifications */
+.toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 9999;
+}
+
+.toast {
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--pico-border-radius);
+    animation: toast-in 0.3s ease-out;
+    color: var(--pico-color);
+    min-width: 250px;
+    max-width: 400px;
+}
+
+.toast--success {
+    background: var(--pico-ins-color);
+}
+
+.toast--error {
+    background: var(--pico-del-color);
+}
+
+.toast--dismiss {
+    animation: toast-out 0.3s ease-in forwards;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes toast-out {
+    from {
+        opacity: 1;
+        transform: none;
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+}
