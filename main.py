@@ -6,7 +6,7 @@ import sys
 from src.application.podcast_service import generate_podcast
 from src.config import Settings
 from src.domain.models import PipelineConfig
-from src.exceptions import AudioWriteError, ConfigurationError, InputError, PodcastError, TTSError
+from src.exceptions import AudioWriteError, ConfigurationError, InputError, PodcastError, ScriptGenerationError, TTSError
 from src.infrastructure.database import create_db_engine, get_session_factory
 from src.infrastructure.database.models import Base
 from src.infrastructure.database.repositories import HostRepository, StyleRepository, seed_defaults
@@ -63,6 +63,9 @@ def main() -> None:
         sys.exit(1)
     except InputError as e:
         logger.error("Input error: %s", e)
+        sys.exit(1)
+    except ScriptGenerationError as e:
+        logger.error("Script generation error: %s", e)
         sys.exit(1)
     except TTSError as e:
         logger.error("TTS error: %s", e)

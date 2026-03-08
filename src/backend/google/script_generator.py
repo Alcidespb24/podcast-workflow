@@ -2,7 +2,7 @@
 
 from google import genai
 
-from src.exceptions import TTSError
+from src.exceptions import ScriptGenerationError
 
 
 class GoogleScriptGenerator:
@@ -21,7 +21,7 @@ class GoogleScriptGenerator:
             Raw script text from the model.
 
         Raises:
-            TTSError: If the API call fails or returns empty content.
+            ScriptGenerationError: If the API call fails or returns empty content.
         """
         try:
             response = self._client.models.generate_content(
@@ -29,10 +29,10 @@ class GoogleScriptGenerator:
                 contents=prompt,
             )
         except Exception as e:
-            raise TTSError(f"Script generation failed: {e}") from e
+            raise ScriptGenerationError(f"Script generation failed: {e}") from e
 
         text = getattr(response, "text", None)
         if not text:
-            raise TTSError("Script generation returned empty content.")
+            raise ScriptGenerationError("Script generation returned empty content.")
 
         return text

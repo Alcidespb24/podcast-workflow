@@ -2,6 +2,9 @@
 
 import re
 
+_SPEAKER_LABEL_RE = re.compile(r"^(\w+):", re.MULTILINE)
+_SENTENCE_BOUNDARY_RE = re.compile(r"(?<=[.!?])\s+")
+
 
 def chunk_script(
     script: str, host_names: list[str], max_chars: int = 12000
@@ -66,7 +69,7 @@ def validate_speakers(
     Returns:
         Tuple of (is_valid, set_of_unexpected_names).
     """
-    found = set(re.findall(r"^(\w+):", script, re.MULTILINE))
+    found = set(_SPEAKER_LABEL_RE.findall(script))
     expected_set = set(expected_names)
     unexpected = found - expected_set
     return (len(unexpected) == 0, unexpected)
@@ -111,8 +114,7 @@ def _parse_turns(script: str, host_names: list[str]) -> list[str]:
 
 def _split_sentences(text: str, max_chars: int) -> list[str]:
     """Split text at sentence boundaries when a single turn is too long."""
-    sentence_ends = re.compile(r"(?<=[.!?])\s+")
-    sentences = sentence_ends.split(text)
+    sentences = _SENTENCE_BOUNDARY_RE.split(text)
 
     chunks: list[str] = []
     current: list[str] = []
