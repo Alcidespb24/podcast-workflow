@@ -22,9 +22,9 @@
 
 ### Audio Processing
 
-- [ ] **AUDIO-01**: Audio crossfading at chunk boundaries (20-50ms overlap) to eliminate artifacts
-- [ ] **AUDIO-02**: Volume normalization across segments (RMS normalization)
-- [ ] **AUDIO-03**: WAV to MP3 conversion (CBR 128kbps mono) via pydub + ffmpeg
+- [x] **AUDIO-01**: Audio crossfading at chunk boundaries (20-50ms overlap) to eliminate artifacts
+- [x] **AUDIO-02**: Volume normalization across segments (RMS normalization)
+- [x] **AUDIO-03**: WAV to MP3 conversion (CBR 128kbps mono) via pydub + ffmpeg
 - [x] **AUDIO-04**: ID3 tags on MP3 files (title, artist, episode number)
 
 ### Automation
@@ -107,9 +107,9 @@
 | DATA-01 | Phase 1 | Complete |
 | DATA-02 | Phase 1 | Complete |
 | DATA-03 | Phase 1 | Complete |
-| AUDIO-01 | Phase 2 | Pending |
-| AUDIO-02 | Phase 2 | Pending |
-| AUDIO-03 | Phase 2 | Pending |
+| AUDIO-01 | Phase 2 | Complete |
+| AUDIO-02 | Phase 2 | Complete |
+| AUDIO-03 | Phase 2 | Complete |
 | AUDIO-04 | Phase 2 | Complete |
 | DIST-01 | Phase 2 | Pending |
 | DIST-02 | Phase 2 | Pending |
@@ -137,4 +137,4 @@
 
 ---
 *Requirements defined: 2026-03-07*
-*Traceability updated: 2026-03-08*
+*Traceability updated: 2026-03-08 (02-02)*

@@ -51,7 +51,7 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md -- Episode model, DB persistence, config extension, dependency installation
-- [ ] 02-02-PLAN.md -- Audio processing pipeline: crossfade, RMS normalization, MP3 export, ID3 tagging
+- [x] 02-02-PLAN.md -- Audio processing pipeline: crossfade, RMS normalization, MP3 export, ID3 tagging
 - [ ] 02-03-PLAN.md -- RSS feed generation + validation, FastAPI app skeleton, Obsidian vault writer
 - [ ] 02-04-PLAN.md -- Pipeline integration: wire audio/RSS/Obsidian into podcast_service, end-to-end verification
 
@@ -93,6 +93,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation and Pipeline Refactor | 5/5 | Complete | 2026-03-07 |
-| 2. Audio Processing and Distribution | 1/4 | Executing | - |
+| 2. Audio Processing and Distribution | 2/4 | Executing | - |
 | 3. Automation | 0/2 | Not started | - |
 | 4. Web Dashboard | 0/2 | Not started | - |
