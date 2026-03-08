@@ -1,2 +1,11 @@
 <h1>Presets</h1>
-<p>Preset management will appear here.</p>
+<button class="outline"
+        hx-get="/dashboard/presets/new"
+        hx-target="body"
+        hx-swap="beforeend">
+    + New Preset
+</button>
+
+<div id="preset-list">
+{% include "partials/presets/row_list.html" %}
+</div>

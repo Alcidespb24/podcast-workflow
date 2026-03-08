@@ -1,0 +1,23 @@
+{% if preset_details %}
+<figure>
+<table role="grid">
+    <thead>
+        <tr>
+            <th>Folder Path</th>
+            <th>Host A</th>
+            <th>Host B</th>
+            <th>Style</th>
+            <th>Personality</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in preset_details %}
+        {% include "partials/presets/row.html" %}
+        {% endfor %}
+    </tbody>
+</table>
+</figure>
+{% else %}
+<p>No presets configured yet. Create one to map a folder to host and style settings.</p>
+{% endif %}

@@ -1,0 +1,58 @@
+<dialog open>
+    <article>
+        <header>
+            <button aria-label="Close" rel="prev" onclick="this.closest('dialog').close(); this.closest('dialog').remove();"></button>
+            <h3>{% if action == 'edit' %}Edit Preset{% else %}New Preset{% endif %}</h3>
+        </header>
+        <form {% if action == 'edit' %}
+                hx-put="/dashboard/presets/{{ preset.id }}"
+              {% else %}
+                hx-post="/dashboard/presets"
+              {% endif %}
+              hx-target="#preset-list"
+              hx-swap="innerHTML"
+              hx-on::after-request="this.closest('dialog').close(); this.closest('dialog').remove();">
+
+            <label for="folder_path">Folder Path</label>
+            <input type="text" id="folder_path" name="folder_path"
+                   value="{{ preset.folder_path if preset else '' }}"
+                   placeholder="/path/to/vault/folder" required>
+
+            <label for="host_a_id">Host A</label>
+            <select id="host_a_id" name="host_a_id" required>
+                {% for host in hosts %}
+                <option value="{{ host.id }}"
+                        {% if preset and preset.host_a_id == host.id %}selected{% endif %}>
+                    {{ host.name }} ({{ host.voice }})
+                </option>
+                {% endfor %}
+            </select>
+
+            <label for="host_b_id">Host B</label>
+            <select id="host_b_id" name="host_b_id" required>
+                {% for host in hosts %}
+                <option value="{{ host.id }}"
+                        {% if preset and preset.host_b_id == host.id %}selected{% endif %}>
+                    {{ host.name }} ({{ host.voice }})
+                </option>
+                {% endfor %}
+            </select>
+
+            <label for="style_id">Style</label>
+            <select id="style_id" name="style_id" required>
+                {% for style in styles %}
+                <option value="{{ style.id }}"
+                        {% if preset and preset.style_id == style.id %}selected{% endif %}>
+                    {{ style.name }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <label for="personality_guidance">Personality Guidance (optional)</label>
+            <textarea id="personality_guidance" name="personality_guidance"
+                      placeholder="Optional guidance for the AI personality...">{{ preset.personality_guidance if preset and preset.personality_guidance else '' }}</textarea>
+
+            <button type="submit">{% if action == 'edit' %}Update{% else %}Create{% endif %} Preset</button>
+        </form>
+    </article>
+</dialog>

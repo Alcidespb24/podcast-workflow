@@ -1,0 +1,24 @@
+<tr>
+    <td>{{ item.preset.folder_path }}</td>
+    <td>{{ item.host_a_name }}</td>
+    <td>{{ item.host_b_name }}</td>
+    <td>{{ item.style_name }}</td>
+    <td>{{ (item.preset.personality_guidance or '')|truncate(40) }}</td>
+    <td>
+        <div role="group">
+            <button class="outline secondary"
+                    hx-get="/dashboard/presets/{{ item.preset.id }}/edit"
+                    hx-target="body"
+                    hx-swap="beforeend">
+                Edit
+            </button>
+            <button class="outline secondary"
+                    hx-delete="/dashboard/presets/{{ item.preset.id }}"
+                    hx-target="#preset-list"
+                    hx-swap="innerHTML"
+                    hx-confirm="Delete preset for folder '{{ item.preset.folder_path }}'? This cannot be undone.">
+                Delete
+            </button>
+        </div>
+    </td>
+</tr>
