@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-03-08T13:35:46.104Z"
-last_activity: 2026-03-08 — Phase 2 Plan 4 executed (Phase 2 complete)
+status: in-progress
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-03-08T13:43:34Z"
+last_activity: 2026-03-08 — Phase 3 Plan 3 executed (integration wiring)
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 12
-  completed_plans: 6
-  percent: 69
+  completed_plans: 8
+  percent: 67
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Knowledge notes automatically become listenable podcast episodes with configurable voices and styles
-**Current focus:** Phase 2 - Audio Processing and Distribution
+**Current focus:** Phase 3 - Automation
 
 ## Current Position
 
-Phase: 2 of 4 (Audio Processing and Distribution) -- COMPLETE
-Plan: 4 of 4 in current phase (done)
-Status: Phase 2 Complete
-Last activity: 2026-03-08 — Phase 2 Plan 4 executed (Phase 2 complete)
+Phase: 3 of 4 (Automation)
+Plan: 3 of 3 in current phase (done)
+Status: Phase 3 Complete
+Last activity: 2026-03-08 — Phase 3 Plan 3 executed (integration wiring)
 
-Progress: [#######░░░] 69%
+Progress: [#######░░░] 67%
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Progress: [#######░░░] 69%
 - Trend: Steady velocity
 
 *Updated after each plan completion*
+| Phase 03 P03 | 5min | 2 tasks | 6 files |
 | Phase 03 P02 | 5 | 2 tasks | 6 files |
 | Phase 03 P01 | 5min | 2 tasks | 9 files |
 
@@ -80,6 +81,9 @@ Recent decisions affecting current work:
 - [Phase 03]: Retry accepts individual params (not Settings) for testability and decoupling
 - [Phase 03]: JobState as str+Enum with valid_transitions() classmethod for state machine logic
 - [Phase 03]: mark_failed() bypasses transition validation for unconditional failure marking
+- [03-03]: State transitions walk full path PROCESSING->ENCODING->PUBLISHING->COMPLETE (domain model enforces adjacency)
+- [03-03]: Fresh session per retry attempt to avoid stale SQLAlchemy state
+- [03-03]: TYPE_CHECKING guard for WatcherService import in app.py to prevent circular imports
 
 ### Pending Todos
 
@@ -91,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-08T13:35:46.102Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-03-08T13:43:34Z
+Stopped at: Completed 03-03-PLAN.md (Phase 3 complete)
 Resume file: None
