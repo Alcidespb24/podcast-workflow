@@ -121,5 +121,8 @@ class WatcherService:
             JobRepository(session).create(job)
             session.commit()
             logger.info("Enqueued job for %s", file_path)
+        except Exception:
+            session.rollback()
+            logger.exception("Failed to enqueue job for %s", file_path)
         finally:
             session.close()

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import os
 import threading
 from collections.abc import Callable
 
@@ -51,20 +50,21 @@ class JobProcessor:
         self._recover_interrupted_jobs()
 
         while not self._shutdown_event.is_set():
+            processed = False
             session = self._session_factory()
             try:
                 job = JobRepository(session).get_next_pending()
                 if job is not None:
                     self._process_job(job, session)
-                    session.close()
-                    # Cooldown between jobs
-                    self._shutdown_event.wait(self._settings.job_cooldown_seconds)
-                else:
-                    session.close()
-                    self._shutdown_event.wait(self._poll_interval)
+                    processed = True
             except Exception:
                 logger.exception("Unexpected error in job processor loop")
+            finally:
                 session.close()
+
+            if processed:
+                self._shutdown_event.wait(self._settings.job_cooldown_seconds)
+            else:
                 self._shutdown_event.wait(self._poll_interval)
 
     # ------------------------------------------------------------------
@@ -184,16 +184,10 @@ class JobProcessor:
     # Helpers
     # ------------------------------------------------------------------
 
-    def _cleanup_partial_output(self, job: Job) -> None:
-        """Remove partial MP3 if it exists."""
-        try:
-            episodes_dir = self._settings.episodes_dir
-            for fname in os.listdir(episodes_dir):
-                if fname.endswith(".mp3"):
-                    path = os.path.join(episodes_dir, fname)
-                    # Heuristic: if file was created very recently, remove it
-                    # A more robust check would use job metadata, but this is safe
-                    # since we process sequentially.
-                    pass  # Placeholder -- sequential processing means no race
-        except OSError:
-            pass
+    @staticmethod
+    def _cleanup_partial_output(job: Job) -> None:
+        """Remove partial output for a failed job.
+
+        Currently a no-op: sequential processing means no orphaned files
+        are produced. Placeholder for future episode-metadata-based cleanup.
+        """
