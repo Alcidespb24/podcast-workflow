@@ -52,6 +52,8 @@ def test_host_get_defaults(db_session: Session) -> None:
     settings = Settings(
         google_api_key="k",
         database_url="sqlite:///:memory:",
+        base_url="https://example.com",
+        vault_output_dir="/tmp/vault",
     )
     seed_defaults(db_session, settings)
     defaults = repo.get_defaults()
@@ -137,6 +139,8 @@ def test_style_get_defaults(db_session: Session) -> None:
     settings = Settings(
         google_api_key="k",
         database_url="sqlite:///:memory:",
+        base_url="https://example.com",
+        vault_output_dir="/tmp/vault",
     )
     seed_defaults(db_session, settings)
     defaults = repo.get_defaults()
@@ -182,6 +186,8 @@ def test_seed_defaults_creates_hosts_and_style(db_session: Session) -> None:
     settings = Settings(
         google_api_key="k",
         database_url="sqlite:///:memory:",
+        base_url="https://example.com",
+        vault_output_dir="/tmp/vault",
     )
     seed_defaults(db_session, settings)
     host_repo = HostRepository(db_session)
@@ -203,6 +209,8 @@ def test_seed_defaults_idempotent(db_session: Session) -> None:
     settings = Settings(
         google_api_key="k",
         database_url="sqlite:///:memory:",
+        base_url="https://example.com",
+        vault_output_dir="/tmp/vault",
     )
     seed_defaults(db_session, settings)
     seed_defaults(db_session, settings)

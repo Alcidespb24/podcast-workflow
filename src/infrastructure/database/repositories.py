@@ -1,13 +1,14 @@
 """Repository classes that map ORM records to domain models."""
 
+import json
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from src.config import Settings
-from src.domain.models import Host, Style
-from src.infrastructure.database.models import HostRecord, StyleRecord
+from src.domain.models import Episode, Host, Style
+from src.infrastructure.database.models import EpisodeRecord, HostRecord, StyleRecord
 
 # Columns that are safe to update via the generic update() method.
 _HOST_MUTABLE_FIELDS = frozenset({"name", "voice", "role", "is_default"})
@@ -132,6 +133,64 @@ class StyleRepository:
         self._session.delete(record)
         self._session.flush()
         return True
+
+
+class EpisodeRepository:
+    """CRUD operations for episodes, returning domain models."""
+
+    def __init__(self, session: Session) -> None:
+        self._session = session
+
+    @staticmethod
+    def _to_domain(record: EpisodeRecord) -> Episode:
+        return Episode(
+            id=record.id,
+            title=record.title,
+            description=record.description,
+            episode_number=record.episode_number,
+            filename=record.filename,
+            duration_seconds=record.duration_seconds,
+            file_size=record.file_size,
+            hosts=json.loads(record.hosts_json),
+            style_name=record.style_name,
+            source_file=record.source_file,
+            published_at=record.published_at,
+        )
+
+    def create(self, episode: Episode) -> Episode:
+        record = EpisodeRecord(
+            title=episode.title,
+            description=episode.description,
+            episode_number=episode.episode_number,
+            filename=episode.filename,
+            duration_seconds=episode.duration_seconds,
+            file_size=episode.file_size,
+            hosts_json=json.dumps(episode.hosts),
+            style_name=episode.style_name,
+            source_file=episode.source_file,
+            published_at=episode.published_at,
+        )
+        self._session.add(record)
+        self._session.flush()
+        return self._to_domain(record)
+
+    def get_by_id(self, episode_id: int) -> Episode | None:
+        record = self._session.get(EpisodeRecord, episode_id)
+        if record is None:
+            return None
+        return self._to_domain(record)
+
+    def get_all(self) -> list[Episode]:
+        stmt = select(EpisodeRecord).order_by(EpisodeRecord.episode_number.desc())
+        return [self._to_domain(r) for r in self._session.scalars(stmt)]
+
+    def get_next_episode_number(self) -> int:
+        max_num = self._session.scalar(
+            select(func.max(EpisodeRecord.episode_number))
+        )
+        if max_num is None:
+            return 1
+        return max_num + 1
 
 
 def seed_defaults(session: Session, settings: Settings) -> None:

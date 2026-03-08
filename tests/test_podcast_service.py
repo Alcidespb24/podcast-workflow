@@ -35,6 +35,8 @@ def settings() -> Settings:
     return Settings(
         google_api_key="test-key",
         database_url="sqlite:///:memory:",
+        base_url="https://example.com",
+        vault_output_dir="/tmp/vault",
     )
 
 

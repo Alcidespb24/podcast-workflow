@@ -1,6 +1,20 @@
 """Domain models for the podcast workflow pipeline."""
 
+import re
+from datetime import datetime
+
 from pydantic import BaseModel, Field, field_validator
+
+_ILLEGAL_FILENAME_CHARS = re.compile(r'[<>:"/\\|?*]')
+_TRAILING_DOTS_SPACES = re.compile(r'[. ]+$')
+
+
+def sanitize_filename(name: str, max_length: int = 200) -> str:
+    """Strip illegal filesystem characters, trailing dots/spaces, and limit length."""
+    cleaned = _ILLEGAL_FILENAME_CHARS.sub("", name)
+    cleaned = cleaned[:max_length]
+    cleaned = _TRAILING_DOTS_SPACES.sub("", cleaned)
+    return cleaned
 
 
 class Host(BaseModel):
@@ -35,3 +49,29 @@ class PipelineConfig(BaseModel):
         if len(v) != 2:
             raise ValueError("Exactly 2 hosts required")
         return v
+
+
+class Episode(BaseModel):
+    """A single podcast episode with metadata."""
+
+    id: int | None = None
+    title: str
+    description: str
+    episode_number: int
+    filename: str
+    duration_seconds: float
+    file_size: int
+    hosts: list[str]
+    style_name: str
+    source_file: str
+    published_at: datetime
+
+    @property
+    def duration_str(self) -> str:
+        """Format duration_seconds as 'MM:SS' or 'H:MM:SS'."""
+        total = int(self.duration_seconds)
+        hours, remainder = divmod(total, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        if hours > 0:
+            return f"{hours}:{minutes:02d}:{seconds:02d}"
+        return f"{minutes}:{seconds:02d}"
