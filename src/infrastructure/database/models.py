@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, Float, Integer, String, Text, func
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -52,6 +52,46 @@ class EpisodeRecord(Base):
         server_default=func.now(),
         default=lambda: datetime.now(timezone.utc),
     )
+
+
+class PresetRecord(Base):
+    """Maps a vault folder to a host pair, style, and optional personality override."""
+
+    __tablename__ = "presets"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    folder_path: Mapped[str] = mapped_column(String(500), unique=True, nullable=False)
+    host_a_id: Mapped[int] = mapped_column(Integer, ForeignKey("hosts.id"), nullable=False)
+    host_b_id: Mapped[int] = mapped_column(Integer, ForeignKey("hosts.id"), nullable=False)
+    style_id: Mapped[int] = mapped_column(Integer, ForeignKey("styles.id"), nullable=False)
+    personality_guidance: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+
+class JobRecord(Base):
+    """A queued pipeline execution tied to a preset."""
+
+    __tablename__ = "jobs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    source_file: Mapped[str] = mapped_column(String(500), nullable=False)
+    preset_id: Mapped[int] = mapped_column(Integer, ForeignKey("presets.id"), nullable=False)
+    state: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    retry_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        default=lambda: datetime.now(timezone.utc),
+    )
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class StyleRecord(Base):

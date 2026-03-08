@@ -31,7 +31,10 @@ class Settings(BaseSettings):
     target_dbfs: float = -20.0
 
     # Phase 3: Automation
+    watcher_enabled: bool = True
     watcher_debounce_seconds: float = 1.5
+    job_cooldown_seconds: float = 10.0
+    job_poll_interval_seconds: float = 5.0
     max_retries: int = 3
     backoff_initial_seconds: float = 5.0
     backoff_multiplier: float = 2.0

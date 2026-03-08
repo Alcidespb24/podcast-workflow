@@ -1,5 +1,6 @@
 """Domain models for the podcast workflow pipeline."""
 
+import enum
 import re
 from datetime import datetime
 
@@ -75,3 +76,56 @@ class Episode(BaseModel):
         if hours > 0:
             return f"{hours}:{minutes:02d}:{seconds:02d}"
         return f"{minutes}:{seconds:02d}"
+
+
+# ---------------------------------------------------------------------------
+# Phase 3: Automation models
+# ---------------------------------------------------------------------------
+
+
+class JobState(str, enum.Enum):
+    """Lifecycle states for an automation job."""
+
+    PENDING = "pending"
+    PROCESSING = "processing"
+    ENCODING = "encoding"
+    PUBLISHING = "publishing"
+    COMPLETE = "complete"
+    FAILED = "failed"
+
+    def valid_transitions(self) -> set["JobState"]:
+        """Return the set of states this state can transition to."""
+        _MAP: dict[JobState, set[JobState]] = {
+            JobState.PENDING: {JobState.PROCESSING, JobState.FAILED},
+            JobState.PROCESSING: {JobState.ENCODING, JobState.FAILED},
+            JobState.ENCODING: {JobState.PUBLISHING, JobState.FAILED},
+            JobState.PUBLISHING: {JobState.COMPLETE, JobState.FAILED},
+            JobState.COMPLETE: set(),
+            JobState.FAILED: set(),
+        }
+        return _MAP[self]
+
+
+class Preset(BaseModel):
+    """Maps a vault folder to a host pair, style, and optional personality override."""
+
+    id: int | None = None
+    folder_path: str
+    host_a_id: int
+    host_b_id: int
+    style_id: int
+    personality_guidance: str | None = None
+
+
+class Job(BaseModel):
+    """A queued pipeline execution tied to a preset."""
+
+    id: int | None = None
+    source_file: str
+    preset_id: int
+    state: JobState = JobState.PENDING
+    error_message: str | None = None
+    retry_count: int = 0
+    created_at: datetime | None = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None

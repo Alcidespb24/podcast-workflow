@@ -30,6 +30,10 @@ class RSSError(PodcastError):
     """RSS feed generation or validation failure."""
 
 
+class WatcherError(PodcastError):
+    """File watcher or job processor failure."""
+
+
 class RateLimitError(PodcastError):
     """API returned 429 rate-limit response."""
 
