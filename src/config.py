@@ -30,6 +30,13 @@ class Settings(BaseSettings):
     crossfade_ms: int = 30
     target_dbfs: float = -20.0
 
+    # Phase 3: Automation
+    watcher_debounce_seconds: float = 1.5
+    max_retries: int = 3
+    backoff_initial_seconds: float = 5.0
+    backoff_multiplier: float = 2.0
+    backoff_max_seconds: float = 300.0
+
     @field_validator("base_url")
     @classmethod
     def _base_url_must_be_https(cls, v: str) -> str:

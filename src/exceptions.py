@@ -28,3 +28,11 @@ class EncodingError(PodcastError):
 
 class RSSError(PodcastError):
     """RSS feed generation or validation failure."""
+
+
+class RateLimitError(PodcastError):
+    """API returned 429 rate-limit response."""
+
+    def __init__(self, message: str, retry_after: float | None = None) -> None:
+        super().__init__(message)
+        self.retry_after = retry_after
