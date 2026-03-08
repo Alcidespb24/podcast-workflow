@@ -1,0 +1,59 @@
+<dialog open data-theme="dark">
+    <article>
+        <header>
+            <button aria-label="Close"
+                    rel="prev"
+                    onclick="this.closest('dialog').remove()"></button>
+            <h3>{% if action == 'edit' %}Edit Host{% else %}New Host{% endif %}</h3>
+        </header>
+        <form {% if action == 'edit' %}
+                  hx-put="/dashboard/hosts/{{ host.id }}"
+              {% else %}
+                  hx-post="/dashboard/hosts"
+              {% endif %}
+              hx-target="#host-list"
+              hx-swap="innerHTML">
+            <label for="host-name">
+                Name
+                <input type="text"
+                       id="host-name"
+                       name="name"
+                       value="{{ host.name if host else '' }}"
+                       placeholder="Host name"
+                       required>
+                {% if errors and 'name' in errors %}
+                <small class="error">{{ errors.name }}</small>
+                {% endif %}
+            </label>
+            <label for="host-voice">
+                Voice
+                <input type="text"
+                       id="host-voice"
+                       name="voice"
+                       value="{{ host.voice if host else '' }}"
+                       placeholder="TTS voice identifier"
+                       required>
+                {% if errors and 'voice' in errors %}
+                <small class="error">{{ errors.voice }}</small>
+                {% endif %}
+            </label>
+            <label for="host-role">
+                Role
+                <select id="host-role" name="role">
+                    <option value="host" {% if host and host.role == 'host' %}selected{% endif %}>Host</option>
+                    <option value="co-host" {% if host and host.role == 'co-host' %}selected{% endif %}>Co-host</option>
+                </select>
+            </label>
+            <footer>
+                <button type="button"
+                        class="secondary"
+                        onclick="this.closest('dialog').remove()">
+                    Cancel
+                </button>
+                <button type="submit">
+                    {% if action == 'edit' %}Save Changes{% else %}Create Host{% endif %}
+                </button>
+            </footer>
+        </form>
+    </article>
+</dialog>

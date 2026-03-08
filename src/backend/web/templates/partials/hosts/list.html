@@ -1,2 +1,33 @@
-<h1>Hosts</h1>
-<p>Host management will appear here.</p>
+<div id="host-list">
+    <header style="display:flex; justify-content:space-between; align-items:center;">
+        <h1>Hosts</h1>
+        <button class="outline"
+                hx-get="/dashboard/hosts/new"
+                hx-target="body"
+                hx-swap="beforeend">
+            + New Host
+        </button>
+    </header>
+
+    {% if hosts %}
+    <figure>
+        <table role="grid">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Voice</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for host in hosts %}
+                {% include "partials/hosts/row.html" %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </figure>
+    {% else %}
+    <p>No hosts configured yet. Create one to get started.</p>
+    {% endif %}
+</div>

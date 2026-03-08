@@ -1,0 +1,22 @@
+<tr>
+    <td>{{ host.name }}</td>
+    <td>{{ host.voice }}</td>
+    <td>{{ host.role }}</td>
+    <td>
+        <div role="group">
+            <button class="outline secondary"
+                    hx-get="/dashboard/hosts/{{ host.id }}/edit"
+                    hx-target="body"
+                    hx-swap="beforeend">
+                Edit
+            </button>
+            <button class="outline secondary"
+                    hx-delete="/dashboard/hosts/{{ host.id }}"
+                    hx-target="#host-list"
+                    hx-swap="innerHTML"
+                    hx-confirm="Delete host '{{ host.name }}'? This cannot be undone.">
+                Delete
+            </button>
+        </div>
+    </td>
+</tr>

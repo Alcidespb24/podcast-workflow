@@ -2,12 +2,16 @@
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
+from sqlalchemy.orm import Session
 
-from src.backend.web.deps import require_auth
+from src.backend.web.deps import get_db, require_auth
 from src.domain.models import JobState
 from src.infrastructure.database.repositories import (
     EpisodeRepository,
+    HostRepository,
     JobRepository,
+    PresetRepository,
+    StyleRepository,
 )
 
 router = APIRouter(
@@ -25,11 +29,13 @@ _PAGES = {
 }
 
 
-def _render_page(request: Request, page: str) -> HTMLResponse:
+def _render_page(request: Request, page: str, extra: dict | None = None) -> HTMLResponse:
     """Render a full page or HTMX partial depending on request type."""
     templates = request.app.state.templates
     partial = _PAGES[page]
-    context = {"request": request, "active_page": page}
+    context: dict = {"request": request, "active_page": page}
+    if extra:
+        context.update(extra)
 
     # Add default sidebar status context for full-page renders
     context.setdefault("watcher_running", False)
@@ -50,21 +56,42 @@ def episodes_page(request: Request):
 
 
 @router.get("/hosts")
-def hosts_page(request: Request):
-    """Render the hosts page."""
-    return _render_page(request, "hosts")
+def hosts_page(request: Request, db: Session = Depends(get_db)):
+    """Render the hosts page with all hosts from the database."""
+    repo = HostRepository(db)
+    hosts = repo.get_all()
+    return _render_page(request, "hosts", extra={"hosts": hosts})
 
 
 @router.get("/styles")
-def styles_page(request: Request):
-    """Render the styles page."""
-    return _render_page(request, "styles")
+def styles_page(request: Request, db: Session = Depends(get_db)):
+    """Render the styles page with all styles from the database."""
+    repo = StyleRepository(db)
+    styles = repo.get_all()
+    return _render_page(request, "styles", extra={"styles": styles})
 
 
 @router.get("/presets")
-def presets_page(request: Request):
-    """Render the presets page."""
-    return _render_page(request, "presets")
+def presets_page(request: Request, db: Session = Depends(get_db)):
+    """Render the presets page with resolved host/style names."""
+    preset_repo = PresetRepository(db)
+    host_repo = HostRepository(db)
+    style_repo = StyleRepository(db)
+
+    presets = preset_repo.get_all()
+    preset_details = []
+    for preset in presets:
+        host_a = host_repo.get_by_id(preset.host_a_id)
+        host_b = host_repo.get_by_id(preset.host_b_id)
+        style = style_repo.get_by_id(preset.style_id)
+        preset_details.append({
+            "preset": preset,
+            "host_a_name": host_a.name if host_a else "Unknown",
+            "host_b_name": host_b.name if host_b else "Unknown",
+            "style_name": style.name if style else "Unknown",
+        })
+
+    return _render_page(request, "presets", extra={"preset_details": preset_details})
 
 
 # Status endpoint -- no auth required (HTMX polling from authenticated page)

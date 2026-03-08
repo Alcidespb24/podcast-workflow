@@ -187,7 +187,8 @@ class TestHostDelete:
 
         response = dashboard_client.delete(f"/dashboard/hosts/{host_id}")
         assert response.status_code == 200
-        assert "DeleteMe" not in response.text
+        # Host should be removed from the list table (name still appears in toast)
+        assert "No hosts configured yet" in response.text or "<tbody>" not in response.text
 
     def test_delete_host_returns_toast(self, dashboard_client: TestClient):
         _seed_host(dashboard_client, name="ByeBye", voice="Kore", role="host")
