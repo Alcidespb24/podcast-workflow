@@ -1,0 +1,26 @@
+<div class="filter-bar" role="group">
+    <button class="{{ 'primary' if not active_filter else 'secondary outline' }}"
+            hx-get="/dashboard/episodes"
+            hx-target="#episode-list"
+            hx-swap="innerHTML">
+        All
+    </button>
+    <button class="{{ 'primary' if active_filter == 'complete' else 'secondary outline' }}"
+            hx-get="/dashboard/episodes?status=complete"
+            hx-target="#episode-list"
+            hx-swap="innerHTML">
+        Complete
+    </button>
+    <button class="{{ 'primary' if active_filter == 'failed' else 'secondary outline' }}"
+            hx-get="/dashboard/episodes?status=failed"
+            hx-target="#episode-list"
+            hx-swap="innerHTML">
+        Failed
+    </button>
+    <button class="{{ 'primary' if active_filter == 'in_progress' else 'secondary outline' }}"
+            hx-get="/dashboard/episodes?status=in_progress"
+            hx-target="#episode-list"
+            hx-swap="innerHTML">
+        In Progress
+    </button>
+</div>

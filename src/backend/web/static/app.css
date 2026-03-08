@@ -90,3 +90,59 @@ body > .dashboard-layout {
         transform: translateY(-8px);
     }
 }
+
+/* Episode cards */
+.episode-card {
+    margin-bottom: 1rem;
+}
+
+.episode-card header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.episode-card audio {
+    width: 100%;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--pico-border-radius);
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-badge--complete {
+    background: #2e7d32;
+    color: #fff;
+}
+
+.status-badge--failed {
+    background: #c62828;
+    color: #fff;
+}
+
+.status-badge--pending,
+.status-badge--processing,
+.status-badge--encoding,
+.status-badge--publishing {
+    background: #f9a825;
+    color: #000;
+}
+
+/* Filter bar */
+.filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.error {
+    color: var(--pico-del-color);
+}

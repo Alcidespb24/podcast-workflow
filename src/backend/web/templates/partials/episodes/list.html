@@ -1,2 +1,13 @@
 <h1>Episodes</h1>
-<p>Episode list will appear here.</p>
+
+{% include "partials/episodes/filters.html" %}
+
+<div id="episode-list">
+{% if items %}
+    {% for item in items %}
+    {% include "partials/episodes/card.html" %}
+    {% endfor %}
+{% else %}
+    <p>No episodes yet.</p>
+{% endif %}
+</div>

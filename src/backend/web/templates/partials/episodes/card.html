@@ -1,0 +1,41 @@
+<article class="episode-card">
+    <header>
+        {% if item.type == 'episode' %}
+        <span class="status-badge status-badge--{{ item.status }}">Ep. {{ item.episode.episode_number }}</span>
+        <strong>{{ item.episode.title }}</strong>
+        {% else %}
+        <strong>{{ item.title }}</strong>
+        {% endif %}
+        <span class="status-badge status-badge--{{ item.status }}">{{ item.status }}</span>
+    </header>
+
+    {% if item.type == 'episode' %}
+    <p>{{ item.episode.description[:120] }}{% if item.episode.description|length > 120 %}...{% endif %}</p>
+    <p>
+        <small>
+            Duration: {{ item.episode.duration_str }} |
+            Hosts: {{ item.episode.hosts | join(', ') }} |
+            Style: {{ item.episode.style_name }} |
+            Source: {{ item.episode.source_file }}
+        </small>
+    </p>
+    <audio controls preload="none">
+        <source src="/episodes/{{ item.episode.filename }}" type="audio/mpeg">
+    </audio>
+
+    {% elif item.status == 'failed' %}
+    <p><small class="error">Error: {{ item.job.error_message }}</small></p>
+    <p><small>Retries: {{ item.job.retry_count }} | Source: {{ item.job.source_file }}</small></p>
+
+    {% else %}
+    <p><small>Status: {{ item.status | capitalize }} | Source: {{ item.job.source_file }}</small></p>
+    {% endif %}
+
+    <footer>
+        <small>
+            {% if item.date %}
+            {{ item.date.strftime('%b %d, %Y %I:%M %p') }}
+            {% endif %}
+        </small>
+    </footer>
+</article>

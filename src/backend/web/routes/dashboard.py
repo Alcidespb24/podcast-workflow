@@ -1,5 +1,8 @@
 """Dashboard routes for the podcast web interface."""
 
+import os
+from typing import Any
+
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
@@ -13,6 +16,9 @@ from src.infrastructure.database.repositories import (
     PresetRepository,
     StyleRepository,
 )
+
+# In-progress job states for filtering
+_IN_PROGRESS_STATES = {JobState.PENDING, JobState.PROCESSING, JobState.ENCODING, JobState.PUBLISHING}
 
 router = APIRouter(
     prefix="/dashboard",
@@ -50,9 +56,61 @@ def _render_page(request: Request, page: str, extra: dict | None = None) -> HTML
 
 
 @router.get("/episodes")
-def episodes_page(request: Request):
-    """Render the episodes page."""
-    return _render_page(request, "episodes")
+def episodes_page(
+    request: Request,
+    status: str | None = None,
+    db: Session = Depends(get_db),
+):
+    """Render the episodes page with combined episode and job history.
+
+    Args:
+        status: Optional filter -- "complete", "failed", "in_progress", or None for all.
+    """
+    episode_repo = EpisodeRepository(db)
+    job_repo = JobRepository(db)
+
+    items: list[dict[str, Any]] = []
+
+    # Add completed episodes (unless filtering to non-complete statuses)
+    if status is None or status == "complete":
+        for ep in episode_repo.get_all():
+            items.append({
+                "type": "episode",
+                "title": ep.title,
+                "date": ep.published_at,
+                "status": "complete",
+                "episode": ep,
+            })
+
+    # Add non-complete jobs (unless filtering to complete only)
+    if status != "complete":
+        non_complete_states = [
+            JobState.PENDING, JobState.PROCESSING, JobState.ENCODING,
+            JobState.PUBLISHING, JobState.FAILED,
+        ]
+        for job in job_repo.get_all(states=non_complete_states):
+            job_status = job.state.value
+            # Apply status filter
+            if status == "failed" and job_status != "failed":
+                continue
+            if status == "in_progress" and job.state not in _IN_PROGRESS_STATES:
+                continue
+            items.append({
+                "type": "job",
+                "title": os.path.basename(job.source_file),
+                "date": job.created_at,
+                "status": job_status,
+                "job": job,
+            })
+
+    # Sort by date descending (newest first)
+    items.sort(key=lambda x: x["date"] or 0, reverse=True)
+
+    return _render_page(
+        request,
+        "episodes",
+        extra={"items": items, "active_filter": status},
+    )
 
 
 @router.get("/hosts")
