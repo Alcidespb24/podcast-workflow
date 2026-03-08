@@ -31,8 +31,8 @@
 
 - [x] **AUTO-01**: File watcher (watchdog) monitors configured vault sub-folders for new .md files
 - [x] **AUTO-02**: Debouncing (1-2s) and deduplication to handle Windows duplicate events
-- [ ] **AUTO-03**: Folder-to-preset mapping: each watched folder maps to a host/style configuration
-- [ ] **AUTO-04**: SQLite job queue with state tracking (pending, processing, encoding, publishing, complete, failed)
+- [x] **AUTO-03**: Folder-to-preset mapping: each watched folder maps to a host/style configuration
+- [x] **AUTO-04**: SQLite job queue with state tracking (pending, processing, encoding, publishing, complete, failed)
 - [x] **AUTO-05**: Retry with exponential backoff on TTS/LLM failures
 - [x] **AUTO-06**: Rate-aware scheduling respecting Gemini API limits
 
@@ -119,8 +119,8 @@
 | OBS-02 | Phase 2 | Complete |
 | AUTO-01 | Phase 3 | Complete |
 | AUTO-02 | Phase 3 | Complete |
-| AUTO-03 | Phase 3 | Pending |
-| AUTO-04 | Phase 3 | Pending |
+| AUTO-03 | Phase 3 | Complete |
+| AUTO-04 | Phase 3 | Complete |
 | AUTO-05 | Phase 3 | Complete |
 | AUTO-06 | Phase 3 | Complete |
 | DASH-01 | Phase 4 | Pending |

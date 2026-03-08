@@ -64,7 +64,7 @@ Plans:
   2. Each watched folder maps to a specific host/style preset, and different folders produce episodes with different configurations
   3. Jobs are tracked in SQLite with state progression (pending through complete/failed) and appear in job history
   4. Failed TTS/LLM calls retry with exponential backoff, and API rate limits are respected without crashing
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 - [ ] 03-01-PLAN.md -- Domain models (Preset/Job/JobState), ORM records, repositories, Alembic migration, Settings extension
@@ -95,5 +95,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Foundation and Pipeline Refactor | 5/5 | Complete | 2026-03-07 |
 | 2. Audio Processing and Distribution | 4/4 | Complete    | 2026-03-08 |
-| 3. Automation | 1/3 | In Progress|  |
+| 3. Automation | 2/3 | In Progress|  |
 | 4. Web Dashboard | 0/2 | Not started | - |
