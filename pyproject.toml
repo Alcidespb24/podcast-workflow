@@ -7,15 +7,22 @@ requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.18.4",
     "dotenv>=0.9.9",
+    "fastapi[standard]>=0.115.0",
+    "feedgen>=1.0.0",
     "google-genai>=1.66.0",
+    "mutagen>=1.47.0",
     "pydantic>=2.12.5",
     "pydantic-settings>=2.13.1",
+    "pydub>=0.25.1",
     "sqlalchemy>=2.0.48",
+    "uvicorn>=0.34.0",
 ]
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.0",
     "pytest>=9.0.2",
+    "pytest-timeout>=2.3.1",
 ]
 
 [tool.pytest.ini_options]

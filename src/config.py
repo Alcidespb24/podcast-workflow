@@ -1,5 +1,6 @@
 """Application settings loaded from environment variables and .env files."""
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,3 +21,18 @@ class Settings(BaseSettings):
     default_host_b_name: str = "Jane"
     default_host_b_voice: str = "Puck"
     default_style_tone: str = "Informative & engaging"
+
+    # Phase 2: Audio processing and distribution
+    podcast_name: str = "My Knowledge Podcast"
+    base_url: str
+    episodes_dir: str = "episodes"
+    vault_output_dir: str
+    crossfade_ms: int = 30
+    target_dbfs: float = -20.0
+
+    @field_validator("base_url")
+    @classmethod
+    def _base_url_must_be_https(cls, v: str) -> str:
+        if not v.startswith("https://"):
+            raise ValueError("base_url must start with https://")
+        return v.rstrip("/")

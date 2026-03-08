@@ -20,3 +20,11 @@ class TTSError(PodcastError):
 
 class AudioWriteError(PodcastError):
     """Output audio file could not be written."""
+
+
+class EncodingError(PodcastError):
+    """MP3 encoding or audio processing failure."""
+
+
+class RSSError(PodcastError):
+    """RSS feed generation or validation failure."""
