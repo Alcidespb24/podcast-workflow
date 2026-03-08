@@ -1,16 +1,19 @@
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from src.domain.models import Host, Style
+from src.domain.models import Episode, Host, Style
+from src.infrastructure.database.models import Base
 
 
 @pytest.fixture()
 def db_engine():
     """Create an in-memory SQLite engine for testing."""
     engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
     yield engine
     engine.dispose()
 
@@ -42,11 +45,30 @@ def sample_style() -> Style:
 
 
 @pytest.fixture()
+def sample_episode() -> Episode:
+    """Return a sample episode for testing."""
+    return Episode(
+        title="Test Episode",
+        description="A test episode description",
+        episode_number=1,
+        filename="2026-03-08_test-episode.mp3",
+        duration_seconds=125.5,
+        file_size=2_000_000,
+        hosts=["Joe", "Jane"],
+        style_name="Default",
+        source_file="notes/test.md",
+        published_at=datetime(2026, 3, 8, 12, 0, 0, tzinfo=timezone.utc),
+    )
+
+
+@pytest.fixture()
 def tmp_env_file(tmp_path: Path) -> Path:
     """Write a temporary .env file with test configuration."""
     env_file = tmp_path / ".env"
     env_file.write_text(
         "GOOGLE_API_KEY=test-key-123\n"
         "DATABASE_URL=sqlite:///test.db\n"
+        "BASE_URL=https://example.com\n"
+        "VAULT_OUTPUT_DIR=/tmp/vault\n"
     )
     return env_file
