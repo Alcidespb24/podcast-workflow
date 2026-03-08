@@ -12,7 +12,7 @@ Transform the existing prototype (Markdown to podcast audio) into a fully automa
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation and Pipeline Refactor** - Data layer, configurable hosts/styles, single-call script generation, enhanced sanitizer
+- [x] **Phase 1: Foundation and Pipeline Refactor** - Data layer, configurable hosts/styles, single-call script generation, enhanced sanitizer
 - [ ] **Phase 2: Audio Processing and Distribution** - MP3 conversion, audio quality, RSS feed, Obsidian output
 - [ ] **Phase 3: Automation** - File watcher, job queue, retry logic, rate-aware scheduling
 - [ ] **Phase 4: Web Dashboard** - Host/style/preset CRUD UI, job history, episode archive
@@ -32,11 +32,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 5 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Test infrastructure, domain models (Host/Style/PipelineConfig), pydantic-settings configuration
-- [ ] 01-02-PLAN.md -- Expanded Obsidian sanitizer (12+ syntax patterns)
-- [ ] 01-03-PLAN.md -- ORM models, repositories, Alembic migrations, default data seeding
-- [ ] 01-04-PLAN.md -- Pipeline refactor: config-driven prompt builder, script chunker, speaker validation, service wiring
-- [ ] 01-05-PLAN.md -- Gap closure: fix Alembic migration idempotency (replace Base.metadata.create_all with programmatic Alembic upgrade)
+- [x] 01-01-PLAN.md -- Test infrastructure, domain models (Host/Style/PipelineConfig), pydantic-settings configuration
+- [x] 01-02-PLAN.md -- Expanded Obsidian sanitizer (12+ syntax patterns)
+- [x] 01-03-PLAN.md -- ORM models, repositories, Alembic migrations, default data seeding
+- [x] 01-04-PLAN.md -- Pipeline refactor: config-driven prompt builder, script chunker, speaker validation, service wiring
+- [x] 01-05-PLAN.md -- Gap closure: fix Alembic migration idempotency (replace Base.metadata.create_all with programmatic Alembic upgrade)
 
 ### Phase 2: Audio Processing and Distribution
 **Goal**: Pipeline output is broadcast-ready MP3 with proper metadata, published to a valid RSS feed, with episode notes saved back to Obsidian
@@ -50,7 +50,7 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 02-01-PLAN.md -- Episode model, DB persistence, config extension, dependency installation
+- [x] 02-01-PLAN.md -- Episode model, DB persistence, config extension, dependency installation
 - [ ] 02-02-PLAN.md -- Audio processing pipeline: crossfade, RMS normalization, MP3 export, ID3 tagging
 - [ ] 02-03-PLAN.md -- RSS feed generation + validation, FastAPI app skeleton, Obsidian vault writer
 - [ ] 02-04-PLAN.md -- Pipeline integration: wire audio/RSS/Obsidian into podcast_service, end-to-end verification
@@ -92,7 +92,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation and Pipeline Refactor | 0/5 | Planning complete | - |
-| 2. Audio Processing and Distribution | 0/4 | Planning complete | - |
+| 1. Foundation and Pipeline Refactor | 5/5 | Complete | 2026-03-07 |
+| 2. Audio Processing and Distribution | 1/4 | Executing | - |
 | 3. Automation | 0/2 | Not started | - |
 | 4. Web Dashboard | 0/2 | Not started | - |
