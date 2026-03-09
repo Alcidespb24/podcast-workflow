@@ -16,6 +16,7 @@ dependencies = [
     "pydub>=0.25.1",
     "sqlalchemy>=2.0.48",
     "uvicorn>=0.34.0",
+    "watchdog>=6.0.0",
 ]
 
 [dependency-groups]

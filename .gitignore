@@ -12,4 +12,25 @@ wheels/
 # Secrets
 .env
 
+# Audio artifacts
+*.wav
+*.mp3
+
+# Episodes output (generated, not source)
+episodes/
+
+# Database
+data/*.db
+
+# Planning docs
 .planning/
+
+# Claude Code
+.claude/
+
+# Python version
+.python-version
+
+# OS files
+Thumbs.db
+.DS_Store

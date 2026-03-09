@@ -25,7 +25,7 @@ class GoogleScriptGenerator:
         """
         try:
             response = self._client.models.generate_content(
-                model="gemini-2.5-pro-preview-06-05",
+                model="gemini-2.5-pro",
                 contents=prompt,
             )
         except Exception as e:

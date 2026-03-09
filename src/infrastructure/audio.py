@@ -17,16 +17,27 @@ from src.exceptions import AudioWriteError, EncodingError
 # ---------------------------------------------------------------------------
 
 def _configure_ffmpeg() -> None:
-    """Point pydub at the imageio-ffmpeg binary if system ffmpeg is missing."""
+    """Point pydub at ffmpeg, searching common install locations as fallback."""
+    import os
+    from pathlib import Path
     from pydub.utils import which as _which
 
     if _which("ffmpeg") is not None:
         return  # system ffmpeg is fine
 
+    # Check common Windows install locations
+    candidates = [
+        Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft/WinGet/Links/ffmpeg.exe",
+        Path(os.environ.get("ProgramFiles", "")) / "ffmpeg/bin/ffmpeg.exe",
+    ]
+    for path in candidates:
+        if path.is_file():
+            AudioSegment.converter = str(path)
+            return
+
     try:
         import imageio_ffmpeg
-        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
-        AudioSegment.converter = ffmpeg_exe
+        AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
     except ImportError:
         pass  # let pydub raise its own error later if needed
 

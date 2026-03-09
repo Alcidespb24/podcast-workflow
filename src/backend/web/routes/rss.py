@@ -23,5 +23,7 @@ def get_feed(request: Request) -> Response:
         podcast_description=f"{settings.podcast_name} - auto-generated podcast feed",
         base_url=settings.base_url,
         episodes=episodes,
+        email=settings.podcast_email,
+        cover_url=settings.podcast_cover_url,
     )
     return Response(content=xml, media_type="application/rss+xml")

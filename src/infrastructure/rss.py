@@ -1,6 +1,7 @@
 """RSS feed generation and validation for podcast distribution."""
 
 import xml.etree.ElementTree as ET
+from datetime import timezone
 
 from feedgen.feed import FeedGenerator
 
@@ -17,6 +18,9 @@ def build_podcast_feed(
     podcast_description: str,
     base_url: str,
     episodes: list[Episode],
+    *,
+    email: str = "",
+    cover_url: str = "",
 ) -> str:
     """Build a complete RSS feed XML string from episode data.
 
@@ -45,6 +49,14 @@ def build_podcast_feed(
         fg.description(podcast_description)
         fg.language("en")
 
+        # Owner / contact
+        if email:
+            fg.podcast.itunes_owner(name=podcast_title, email=email)
+            fg.managingEditor(email)
+        if cover_url:
+            fg.podcast.itunes_image(cover_url)
+            fg.image(url=cover_url, title=podcast_title, link=base_url)
+
         # iTunes namespace fields
         fg.podcast.itunes_author(podcast_title)
         fg.podcast.itunes_explicit("no")
@@ -59,7 +71,10 @@ def build_podcast_feed(
             entry.id(enclosure_url)
             entry.title(ep.title)
             entry.description(ep.description)
-            entry.published(ep.published_at)
+            pub_at = ep.published_at
+            if pub_at and pub_at.tzinfo is None:
+                pub_at = pub_at.replace(tzinfo=timezone.utc)
+            entry.published(pub_at)
             entry.enclosure(enclosure_url, str(ep.file_size), "audio/mpeg")
 
             entry.podcast.itunes_duration(ep.duration_str)

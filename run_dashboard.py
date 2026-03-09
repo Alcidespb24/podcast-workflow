@@ -12,6 +12,7 @@ from src.config import Settings
 from src.infrastructure.database import create_db_engine, get_session_factory, run_migrations
 from src.infrastructure.database.repositories import EpisodeRepository, seed_defaults
 from src.backend.web.app import create_app
+from src.backend.watcher.service import WatcherService
 
 settings = Settings()
 
@@ -28,7 +29,9 @@ def get_episodes():
     with session_factory() as s:
         return EpisodeRepository(s).get_all()
 
-app = create_app(settings, get_episodes=get_episodes, session_factory=session_factory)
+watcher_service = WatcherService(settings, session_factory)
+
+app = create_app(settings, get_episodes=get_episodes, session_factory=session_factory, watcher_service=watcher_service)
 
 if __name__ == "__main__":
     uvicorn.run(app, host=settings.dashboard_host, port=8000)
