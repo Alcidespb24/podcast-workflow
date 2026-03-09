@@ -4,7 +4,7 @@ import secrets
 from typing import Annotated, Generator
 
 from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
+from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy.orm import Session
@@ -49,7 +49,7 @@ def require_auth(
                 settings.REDACTED_FIELD_hash,
                 credentials.password,
             )
-        except VerifyMismatchError:
+        except (VerifyMismatchError, VerificationError, InvalidHashError):
             password_ok = False
 
     if not (username_ok and password_ok):
