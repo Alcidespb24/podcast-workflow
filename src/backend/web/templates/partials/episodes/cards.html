@@ -1,0 +1,7 @@
+{% if items %}
+    {% for item in items %}
+    {% include "partials/episodes/card.html" %}
+    {% endfor %}
+{% else %}
+    <p>No episodes yet.</p>
+{% endif %}

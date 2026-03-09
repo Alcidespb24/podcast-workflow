@@ -163,3 +163,34 @@ class TestEpisodeStatusFilter:
         )
         assert response.status_code == 200
         assert "<!DOCTYPE" not in response.text
+
+    def test_filter_htmx_returns_cards_only_not_full_list(
+        self, dashboard_client: TestClient, _seed_episodes_and_jobs
+    ):
+        """Filter requests must return card HTML only, not the heading/filters/wrapper."""
+        response = dashboard_client.get(
+            "/dashboard/episodes?status=complete",
+            headers={"HX-Request": "true", "HX-Target": "episode-list"},
+        )
+        assert response.status_code == 200
+        html = response.text
+        # Must NOT contain the heading or filter bar (those are in list.html, not cards.html)
+        assert "<h1>Episodes</h1>" not in html
+        assert 'class="filter-bar"' not in html
+        # Must NOT contain the wrapper div (that would cause nesting)
+        assert 'id="episode-list"' not in html
+        # Must contain actual episode content
+        assert "First Episode" in html
+
+    def test_sidebar_nav_returns_full_partial(
+        self, dashboard_client: TestClient, _seed_episodes_and_jobs
+    ):
+        """Sidebar navigation (HX-Request but no HX-Target=episode-list) returns full list partial."""
+        response = dashboard_client.get(
+            "/dashboard/episodes",
+            headers={"HX-Request": "true"},
+        )
+        assert response.status_code == 200
+        html = response.text
+        assert "<h1>Episodes</h1>" in html
+        assert 'id="episode-list"' in html

@@ -3,11 +3,5 @@
 {% include "partials/episodes/filters.html" %}
 
 <div id="episode-list">
-{% if items %}
-    {% for item in items %}
-    {% include "partials/episodes/card.html" %}
-    {% endfor %}
-{% else %}
-    <p>No episodes yet.</p>
-{% endif %}
+{% include "partials/episodes/cards.html" %}
 </div>

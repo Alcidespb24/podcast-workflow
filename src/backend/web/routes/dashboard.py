@@ -106,6 +106,16 @@ def episodes_page(
     # Sort by date descending (newest first)
     items.sort(key=lambda x: x["date"] or 0, reverse=True)
 
+    # Filter request targets #episode-list — return cards only
+    if request.headers.get("HX-Target") == "episode-list":
+        templates = request.app.state.templates
+        context = {"request": request, "items": items, "active_filter": status}
+        return templates.TemplateResponse(
+            request=request,
+            name="partials/episodes/cards.html",
+            context=context,
+        )
+
     return _render_page(
         request,
         "episodes",
