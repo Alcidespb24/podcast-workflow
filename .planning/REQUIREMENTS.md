@@ -14,7 +14,7 @@ Requirements for Security Hardening milestone. Each maps to roadmap phases.
 
 ### Authentication
 
-- [ ] **AUTH-01**: Dashboard password is stored as Argon2id hash, never plaintext
+- [x] **AUTH-01**: Dashboard password is stored as Argon2id hash, never plaintext
 - [x] **AUTH-02**: CLI tool generates password hashes for `.env` configuration
 - [x] **AUTH-03**: App refuses to start if password hash is missing or malformed
 - [ ] **AUTH-04**: Session-based auth replaces HTTP Basic Auth with signed cookies
@@ -80,7 +80,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | SEC-01 | Phase 5 | Pending |
 | SEC-02 | Phase 5 | Complete (05-01) |
-| AUTH-01 | Phase 5 | Pending |
+| AUTH-01 | Phase 5 | Complete (05-02) |
 | AUTH-02 | Phase 5 | Complete (05-01) |
 | AUTH-03 | Phase 5 | Complete (05-01) |
 | AUTH-04 | Phase 6 | Pending |

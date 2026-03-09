@@ -23,7 +23,7 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full details.
 
 **Milestone Goal:** Harden the application for VPS deployment and open-source readiness — eliminate all security vulnerabilities found in audit.
 
-- [ ] **Phase 5: Secrets and Configuration Foundation** - Scrub git history, migrate to env-based secrets, implement password hashing infrastructure
+- [x] **Phase 5: Secrets and Configuration Foundation** - Scrub git history, migrate to env-based secrets, implement password hashing infrastructure
 - [ ] **Phase 6: Authentication Overhaul** - Replace HTTP Basic Auth with session-based auth, login/logout pages, session management
 - [ ] **Phase 7: HTTP Hardening** - Rate limiting, CSRF protection, security headers, CORS policy
 - [ ] **Phase 8: Path Validation** - Prevent path traversal on all file operations and preset folder paths
@@ -44,7 +44,7 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full details.
 
 Plans:
 - [x] 05-01-PLAN.md — Config foundation: Argon2id hash field, CLI tool, .env.example, startup validation
-- [ ] 05-02-PLAN.md — Auth integration: Wire Argon2id verification into require_auth
+- [x] 05-02-PLAN.md — Auth integration: Wire Argon2id verification into require_auth
 
 ### Phase 6: Authentication Overhaul
 **Goal**: Users authenticate via a dedicated login page with session-based auth, replacing the browser HTTP Basic Auth prompt entirely
@@ -86,7 +86,7 @@ Plans:
 | 2. Audio Processing and Distribution | v1.0 | 4/4 | Complete | 2026-03-08 |
 | 3. Automation | v1.0 | 3/3 | Complete | 2026-03-08 |
 | 4. Web Dashboard | v1.0 | 4/4 | Complete | 2026-03-09 |
-| 5. Secrets and Configuration Foundation | v1.1 | 1/2 | In progress | - |
+| 5. Secrets and Configuration Foundation | v1.1 | 2/2 | Complete | 2026-03-09 |
 | 6. Authentication Overhaul | v1.1 | 0/0 | Not started | - |
 | 7. HTTP Hardening | v1.1 | 0/0 | Not started | - |
 | 8. Path Validation | v1.1 | 0/0 | Not started | - |
