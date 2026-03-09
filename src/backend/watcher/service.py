@@ -36,6 +36,11 @@ class WatcherService:
         self._processor_thread: threading.Thread | None = None
         self._handlers: list[DebouncedMarkdownHandler] = []
 
+    @property
+    def is_running(self) -> bool:
+        """Whether the watcher observer is currently running."""
+        return self._observer is not None and self._observer.is_alive()
+
     # ------------------------------------------------------------------
     # Lifecycle
     # ------------------------------------------------------------------
