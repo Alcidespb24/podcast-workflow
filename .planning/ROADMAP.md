@@ -1,101 +1,92 @@
 # Roadmap: Podcast Workflow
 
-## Overview
+## Milestones
 
-Transform the existing prototype (Markdown to podcast audio) into a fully automated, end-to-end pipeline. The build sequence moves from configurable foundation and refactored pipeline core, through audio post-production and RSS distribution, into file-watching automation, and finally a web dashboard for managing it all. Each phase delivers a coherent, testable capability that builds on the last.
+- ✅ **v1.0 MVP** — Phases 1-4 (shipped 2026-03-09)
+- 🚧 **v1.1 Security Hardening** — Phases 5-8 (in progress)
 
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+<details>
+<summary>✅ v1.0 MVP (Phases 1-4) — SHIPPED 2026-03-09</summary>
 
-Decimal phases appear between their surrounding integers in numeric order.
+- [x] Phase 1: Foundation and Pipeline Refactor (5/5 plans) — completed 2026-03-07
+- [x] Phase 2: Audio Processing and Distribution (4/4 plans) — completed 2026-03-08
+- [x] Phase 3: Automation (3/3 plans) — completed 2026-03-08
+- [x] Phase 4: Web Dashboard (4/4 plans) — completed 2026-03-09
 
-- [x] **Phase 1: Foundation and Pipeline Refactor** - Data layer, configurable hosts/styles, single-call script generation, enhanced sanitizer
-- [x] **Phase 2: Audio Processing and Distribution** - MP3 conversion, audio quality, RSS feed, Obsidian output (completed 2026-03-08)
-- [x] **Phase 3: Automation** - File watcher, job queue, retry logic, rate-aware scheduling (completed 2026-03-08)
-- [ ] **Phase 4: Web Dashboard** - Host/style/preset CRUD UI, job history, episode archive
+See: `.planning/milestones/v1.0-ROADMAP.md` for full details.
+
+</details>
+
+### 🚧 v1.1 Security Hardening (In Progress)
+
+**Milestone Goal:** Harden the application for VPS deployment and open-source readiness — eliminate all security vulnerabilities found in audit.
+
+- [ ] **Phase 5: Secrets and Configuration Foundation** - Scrub git history, migrate to env-based secrets, implement password hashing infrastructure
+- [ ] **Phase 6: Authentication Overhaul** - Replace HTTP Basic Auth with session-based auth, login/logout pages, session management
+- [ ] **Phase 7: HTTP Hardening** - Rate limiting, CSRF protection, security headers, CORS policy
+- [ ] **Phase 8: Path Validation** - Prevent path traversal on all file operations and preset folder paths
 
 ## Phase Details
 
-### Phase 1: Foundation and Pipeline Refactor
-**Goal**: Users can configure podcast hosts and styles, and the pipeline produces quality multi-speaker scripts from any Obsidian markdown note using those configurations
-**Depends on**: Nothing (first phase)
-**Requirements**: PIPE-01, PIPE-02, PIPE-03, PIPE-04, PIPE-05, PIPE-06, PIPE-07, PREP-01, PREP-02, DATA-01, DATA-02, DATA-03
+### Phase 5: Secrets and Configuration Foundation
+**Goal**: All secrets are removed from git history and loaded exclusively from environment variables, with password hashing infrastructure ready for auth overhaul
+**Depends on**: Phase 4 (v1.0 complete)
+**Requirements**: SEC-01, SEC-02, AUTH-01, AUTH-02, AUTH-03
 **Success Criteria** (what must be TRUE):
-  1. User can create and persist host configurations (name, voice, personality, role) and style configurations (tone, length, structure, speaker count) in the database
-  2. User can run the pipeline against any Obsidian markdown file and receive a coherent multi-speaker podcast script that uses configured host/style presets
-  3. Obsidian-specific syntax (callouts, embeds, Mermaid, Dataview, math, comments, highlights, tags, block IDs, footnotes) is stripped cleanly before script generation
-  4. The pipeline enforces a 2-speaker maximum and validates speaker names between LLM output and TTS config before synthesis
-  5. Schema migrations work via Alembic and configuration loads via pydantic-settings
-**Plans:** 5 plans
+  1. Running `git log -p` across full history shows zero API keys, passwords, or `.env` values
+  2. `.env.example` exists with placeholder values documenting every required environment variable
+  3. Dashboard password in `.env` is an Argon2id hash, and the app verifies login against it
+  4. Running `python -m podcast_workflow.hash_password` (or equivalent CLI) outputs a valid Argon2id hash for a given password
+  5. App refuses to start with a clear error message if `DASHBOARD_PASSWORD_HASH` is missing or not a valid Argon2id hash
+**Plans:** 2 plans
 
 Plans:
-- [x] 01-01-PLAN.md -- Test infrastructure, domain models (Host/Style/PipelineConfig), pydantic-settings configuration
-- [x] 01-02-PLAN.md -- Expanded Obsidian sanitizer (12+ syntax patterns)
-- [x] 01-03-PLAN.md -- ORM models, repositories, Alembic migrations, default data seeding
-- [x] 01-04-PLAN.md -- Pipeline refactor: config-driven prompt builder, script chunker, speaker validation, service wiring
-- [x] 01-05-PLAN.md -- Gap closure: fix Alembic migration idempotency (replace Base.metadata.create_all with programmatic Alembic upgrade)
+- [ ] 05-01-PLAN.md — Config foundation: Argon2id hash field, CLI tool, .env.example, startup validation
+- [ ] 05-02-PLAN.md — Auth integration: Wire Argon2id verification into require_auth
 
-### Phase 2: Audio Processing and Distribution
-**Goal**: Pipeline output is broadcast-ready MP3 with proper metadata, published to a valid RSS feed, with episode notes saved back to Obsidian
-**Depends on**: Phase 1
-**Requirements**: AUDIO-01, AUDIO-02, AUDIO-03, AUDIO-04, DIST-01, DIST-02, DIST-03, DIST-04, OBS-01, OBS-02
+### Phase 6: Authentication Overhaul
+**Goal**: Users authenticate via a dedicated login page with session-based auth, replacing the browser HTTP Basic Auth prompt entirely
+**Depends on**: Phase 5 (password hashing infrastructure)
+**Requirements**: AUTH-04, AUTH-05, AUTH-06, AUTH-07, AUTH-08
 **Success Criteria** (what must be TRUE):
-  1. Generated audio has smooth transitions between chunks (no clicks, pops, or silence gaps at boundaries)
-  2. Pipeline outputs a properly tagged MP3 file (ID3: title, artist, episode number) at CBR 128kbps mono
-  3. An RSS feed with iTunes namespace tags is generated, validates successfully, and is served via HTTP for Spotify ingestion
-  4. MP3 file and a markdown note (with metadata, transcript, and audio link) are saved to the configured Obsidian vault folder
-**Plans:** 4/4 plans complete
+  1. Visiting any dashboard page while unauthenticated redirects to a styled login page (no browser prompt)
+  2. After successful login, user receives a signed session cookie and can navigate all dashboard pages without re-authenticating
+  3. Clicking logout invalidates the session and redirects to the login page; the old session cookie no longer grants access
+  4. A session left idle beyond the configured timeout requires re-authentication on the next request
+  5. Hitting `/dashboard/status` without a valid session returns 401 (or redirects to login), not the status data
+**Plans**: TBD
 
-Plans:
-- [x] 02-01-PLAN.md -- Episode model, DB persistence, config extension, dependency installation
-- [x] 02-02-PLAN.md -- Audio processing pipeline: crossfade, RMS normalization, MP3 export, ID3 tagging
-- [ ] 02-03-PLAN.md -- RSS feed generation + validation, FastAPI app skeleton, Obsidian vault writer
-- [ ] 02-04-PLAN.md -- Pipeline integration: wire audio/RSS/Obsidian into podcast_service, end-to-end verification
-
-### Phase 3: Automation
-**Goal**: Users can drop a markdown file into a watched Obsidian folder and a podcast episode is produced end-to-end without manual intervention
-**Depends on**: Phase 2
-**Requirements**: AUTO-01, AUTO-02, AUTO-03, AUTO-04, AUTO-05, AUTO-06
+### Phase 7: HTTP Hardening
+**Goal**: The application resists brute-force attacks, cross-site request forgery, and common HTTP-level exploits
+**Depends on**: Phase 6 (sessions required for CSRF token binding; login endpoint must exist for rate limiting)
+**Requirements**: HTTP-01, HTTP-02, HTTP-03, HTTP-04
 **Success Criteria** (what must be TRUE):
-  1. Dropping a .md file into a watched vault folder triggers the full pipeline automatically (with 1-2s debounce, no duplicate processing)
-  2. Each watched folder maps to a specific host/style preset, and different folders produce episodes with different configurations
-  3. Jobs are tracked in SQLite with state progression (pending through complete/failed) and appear in job history
-  4. Failed TTS/LLM calls retry with exponential backoff, and API rate limits are respected without crashing
-**Plans:** 3/3 plans complete
+  1. After 5 failed login attempts from the same IP within 15 minutes, the 6th attempt returns 429 Too Many Requests
+  2. Every HTTP response includes X-Content-Type-Options, X-Frame-Options, Referrer-Policy, and Strict-Transport-Security headers
+  3. A cross-origin request from an unlisted origin is rejected by CORS policy; a request from a configured origin succeeds
+  4. All HTMX-driven POST, PUT, and DELETE operations (host/style/preset CRUD) continue working with CSRF tokens attached via `hx-headers`; a request missing the CSRF token is rejected with 403
+**Plans**: TBD
 
-Plans:
-- [ ] 03-01-PLAN.md -- Domain models (Preset/Job/JobState), ORM records, repositories, Alembic migration, Settings extension
-- [ ] 03-02-PLAN.md -- Debounced watchdog handler for .md files, 429-aware retry with exponential backoff
-- [ ] 03-03-PLAN.md -- Job processor, watcher service, FastAPI lifespan integration, standalone CLI
-
-### Phase 4: Web Dashboard
-**Goal**: Users can manage all podcast configuration and view episode history through a browser-based interface
-**Depends on**: Phase 3
-**Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06
+### Phase 8: Path Validation
+**Goal**: All file system operations are confined to allowed directories, preventing path traversal attacks
+**Depends on**: Phase 5 (configuration foundation); can run in parallel with Phase 7
+**Requirements**: PATH-01, PATH-02
 **Success Criteria** (what must be TRUE):
-  1. User can create, edit, and delete hosts and styles through the web UI
-  2. User can assign host/style presets to vault folders through the web UI
-  3. User can browse past episodes with status, metadata, and an in-browser audio player
-  4. Dashboard is served via FastAPI with HTMX (no JS build step), protected by authentication, and bound to localhost by default
-**Plans:** 4 plans
-
-Plans:
-- [x] 04-01-PLAN.md -- Dashboard foundation: auth, session dependency, app wiring, base template, sidebar, static assets
-- [x] 04-02-PLAN.md -- Host and Style CRUD: modal forms, inline validation, delete confirmation, toast feedback
-- [x] 04-03-PLAN.md -- Preset CRUD with dropdown selectors, episode/job history with status filtering and audio player
-- [ ] 04-04-PLAN.md -- Gap closure: fix episode filter duplication and toast auto-dismiss
+  1. Creating or updating a preset with a folder path containing `../` or absolute paths outside the configured base directory is rejected with a clear validation error
+  2. Any file read/write operation (episode output, markdown input, audio export) that would resolve outside allowed directories is blocked before touching the filesystem
+**Plans**: TBD
 
 ## Progress
 
-**Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Foundation and Pipeline Refactor | 5/5 | Complete | 2026-03-07 |
-| 2. Audio Processing and Distribution | 4/4 | Complete    | 2026-03-08 |
-| 3. Automation | 3/3 | Complete   | 2026-03-08 |
-| 4. Web Dashboard | 3/4 | UAT Fixes | - |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. Foundation and Pipeline Refactor | v1.0 | 5/5 | Complete | 2026-03-07 |
+| 2. Audio Processing and Distribution | v1.0 | 4/4 | Complete | 2026-03-08 |
+| 3. Automation | v1.0 | 3/3 | Complete | 2026-03-08 |
+| 4. Web Dashboard | v1.0 | 4/4 | Complete | 2026-03-09 |
+| 5. Secrets and Configuration Foundation | v1.1 | 0/2 | Planning complete | - |
+| 6. Authentication Overhaul | v1.1 | 0/0 | Not started | - |
+| 7. HTTP Hardening | v1.1 | 0/0 | Not started | - |
+| 8. Path Validation | v1.1 | 0/0 | Not started | - |
