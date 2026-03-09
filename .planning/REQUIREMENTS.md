@@ -1,140 +1,105 @@
 # Requirements: Podcast Workflow
 
-**Defined:** 2026-03-07
-**Core Value:** Knowledge notes automatically become listenable podcast episodes with configurable voices and styles
+**Defined:** 2026-03-09
+**Core Value:** Knowledge notes automatically become listenable podcast episodes with configurable voices and styles — no manual intervention required.
 
-## v1 Requirements
+## v1.1 Requirements
 
-### Pipeline Core
+Requirements for Security Hardening milestone. Each maps to roadmap phases.
 
-- [x] **PIPE-01**: Hosts are configurable with name, TTS voice, personality traits, and role
-- [x] **PIPE-02**: Podcast styles are configurable with tone, target length, structure, and speaker count
-- [x] **PIPE-03**: Full podcast script generated in one LLM call (not per-chunk) to preserve conversation continuity
-- [x] **PIPE-04**: Generated script chunked at TTS stage (not content stage) with speaker-turn-aware boundaries
-- [x] **PIPE-05**: Speaker names validated/normalized between LLM output and TTS config before synthesis
-- [x] **PIPE-06**: 2-speaker maximum enforced in domain model and all configuration surfaces
-- [x] **PIPE-07**: Clean architecture maintained across all new components (domain/infrastructure/application/backend)
+### Secrets & History
 
-### Content Preprocessing
+- [ ] **SEC-01**: Git history is scrubbed of all committed secrets (.env, API keys) before open-source release
+- [x] **SEC-02**: `.env.example` ships with placeholder values documenting all required env vars
 
-- [x] **PREP-01**: Obsidian sanitizer expanded to handle callouts, embeds, Mermaid, Dataview, math blocks, comments, highlights, tags, block IDs, footnotes, and strikethrough
-- [x] **PREP-02**: Fallback splitting for single paragraphs exceeding chunk size (sentence-level split)
+### Authentication
 
-### Audio Processing
+- [ ] **AUTH-01**: Dashboard password is stored as Argon2id hash, never plaintext
+- [x] **AUTH-02**: CLI tool generates password hashes for `.env` configuration
+- [x] **AUTH-03**: App refuses to start if password hash is missing or malformed
+- [ ] **AUTH-04**: Session-based auth replaces HTTP Basic Auth with signed cookies
+- [ ] **AUTH-05**: User can log in via a dedicated login page (not browser prompt)
+- [ ] **AUTH-06**: User can log out and session is invalidated
+- [ ] **AUTH-07**: Sessions expire after configurable timeout
+- [ ] **AUTH-08**: `/dashboard/status` endpoint requires authentication
 
-- [x] **AUDIO-01**: Audio crossfading at chunk boundaries (20-50ms overlap) to eliminate artifacts
-- [x] **AUDIO-02**: Volume normalization across segments (RMS normalization)
-- [x] **AUDIO-03**: WAV to MP3 conversion (CBR 128kbps mono) via pydub + ffmpeg
-- [x] **AUDIO-04**: ID3 tags on MP3 files (title, artist, episode number)
+### HTTP Hardening
 
-### Automation
+- [ ] **HTTP-01**: Login endpoint is rate-limited (max 5 attempts per 15 minutes per IP)
+- [ ] **HTTP-02**: Security headers are set on all responses (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, HSTS)
+- [ ] **HTTP-03**: CORS policy restricts origins to configured allowlist
+- [ ] **HTTP-04**: CSRF protection covers all state-changing requests (POST, PUT, DELETE) via header-based tokens compatible with HTMX
 
-- [x] **AUTO-01**: File watcher (watchdog) monitors configured vault sub-folders for new .md files
-- [x] **AUTO-02**: Debouncing (1-2s) and deduplication to handle Windows duplicate events
-- [x] **AUTO-03**: Folder-to-preset mapping: each watched folder maps to a host/style configuration
-- [x] **AUTO-04**: SQLite job queue with state tracking (pending, processing, encoding, publishing, complete, failed)
-- [x] **AUTO-05**: Retry with exponential backoff on TTS/LLM failures
-- [x] **AUTO-06**: Rate-aware scheduling respecting Gemini API limits
+### Path Validation
+
+- [ ] **PATH-01**: Preset folder paths are validated against a configurable base directory, rejecting traversal attempts
+- [ ] **PATH-02**: All file read/write operations validate paths are within allowed directories
+
+## Future Requirements
+
+Deferred to future milestones. Tracked but not in current roadmap.
+
+### OpenClaw Integration
+
+- **CLAW-01**: Success/fail status notifications sent to Telegram via OpenClaw
+- **CLAW-02**: Review mode — audio sent to Telegram for approval before publishing
+- **CLAW-03**: OpenClaw integration contract definition
+
+### Audio Enhancement
+
+- **AUD-01**: Intro/outro audio templates per podcast style
+- **AUD-02**: Audio quality validation (SNR check)
+- **AUD-03**: Fallback TTS provider for Gemini instability
 
 ### Distribution
 
-- [x] **DIST-01**: RSS feed generation with iTunes namespace tags via feedgen
-- [x] **DIST-02**: MP3 hosting via FastAPI static file serving
-- [x] **DIST-03**: Episode metadata (title, description, tags) in RSS feed
-- [x] **DIST-04**: RSS feed validation before publishing
-
-### Obsidian Integration
-
-- [x] **OBS-01**: MP3 audio file saved to configured Obsidian vault folder
-- [x] **OBS-02**: Markdown note created with episode metadata, transcript, and link to audio
-
-### Web Dashboard
-
-- [x] **DASH-01**: Host CRUD — create, edit, delete podcast hosts via web UI
-- [x] **DASH-02**: Style CRUD — create, edit, delete podcast styles via web UI
-- [x] **DASH-03**: Folder preset mapping — assign host/style configs to vault folders
-- [x] **DASH-04**: Job/episode history — view past episodes with status, audio player, metadata
-- [x] **DASH-05**: FastAPI + HTMX + Jinja2 stack (no JS build step)
-- [x] **DASH-06**: Authentication (at minimum HTTP Basic Auth, bind to 127.0.0.1 by default)
-
-### Data Layer
-
-- [x] **DATA-01**: SQLite database with SQLAlchemy ORM for hosts, styles, presets, episodes
-- [x] **DATA-02**: Alembic migrations for schema evolution
-- [x] **DATA-03**: Pydantic-settings for configuration management
-
-## v2 Requirements
-
-### Notifications
-
-- **NOTF-01**: OpenClaw status notification (success/fail → Telegram)
-- **NOTF-02**: Review mode — audio sent to Telegram for approve/reject before publishing
-- **NOTF-03**: OpenClaw integration contract definition
-
-### Enhancements
-
-- **ENH-01**: Intro/outro audio templates per podcast style
-- **ENH-02**: Audio quality validation (SNR check, reject degraded TTS output)
-- **ENH-03**: Fallback TTS provider for Gemini instability periods
-- **ENH-04**: Cloud audio hosting (Cloudflare R2 or S3) for production RSS
+- **DIST-01**: Cloud audio hosting (Cloudflare R2 or S3) for production RSS
 
 ## Out of Scope
 
+Explicitly excluded. Documented to prevent scope creep.
+
 | Feature | Reason |
 |---------|--------|
-| Video podcasts | Audio only — massive complexity for minimal value |
-| Voice cloning | Legal/ethical concerns, Gemini TTS doesn't support it |
-| Real-time streaming | Batch pipeline, completely different architecture |
-| Mobile app | Web dashboard accessible from phone browser |
-| Obsidian TypeScript plugin | Stay in Python, interact via filesystem |
-| AI-generated cover art | Out of scope — manual or template-based |
-| Multi-language translation | Single language per episode |
-| Complex scheduling (cron) | OpenClaw handles scheduling externally |
+| JWT tokens | Over-engineering for single-user app; signed session cookies are sufficient |
+| OAuth2 / OIDC | No external identity provider needed for personal tool |
+| Redis session store | In-memory sessions sufficient for single-user; no horizontal scaling needed |
+| WAF / fail2ban integration | Infrastructure-level concern, not application responsibility |
+| Role-based access control | Single user, no roles needed |
+| Database-backed user management | Single user configured via env vars is sufficient |
+| HTTPS termination in app | Handled by reverse proxy (nginx/Caddy) on VPS |
+| Automated key rotation | Manual rotation sufficient for personal tool |
+| CAPTCHA | Over-engineering; rate limiting is sufficient for single-user |
+| Self-hosting HTMX/Pico CSS | Low priority; CDN is acceptable for now |
 
 ## Traceability
 
+Which phases cover which requirements. Updated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PIPE-01 | Phase 1 | Complete |
-| PIPE-02 | Phase 1 | Complete |
-| PIPE-03 | Phase 1 | Complete |
-| PIPE-04 | Phase 1 | Complete |
-| PIPE-05 | Phase 1 | Complete |
-| PIPE-06 | Phase 1 | Complete |
-| PIPE-07 | Phase 1 | Complete |
-| PREP-01 | Phase 1 | Complete |
-| PREP-02 | Phase 1 | Complete |
-| DATA-01 | Phase 1 | Complete |
-| DATA-02 | Phase 1 | Complete |
-| DATA-03 | Phase 1 | Complete |
-| AUDIO-01 | Phase 2 | Complete |
-| AUDIO-02 | Phase 2 | Complete |
-| AUDIO-03 | Phase 2 | Complete |
-| AUDIO-04 | Phase 2 | Complete |
-| DIST-01 | Phase 2 | Complete |
-| DIST-02 | Phase 2 | Complete |
-| DIST-03 | Phase 2 | Complete |
-| DIST-04 | Phase 2 | Complete |
-| OBS-01 | Phase 2 | Complete |
-| OBS-02 | Phase 2 | Complete |
-| AUTO-01 | Phase 3 | Complete |
-| AUTO-02 | Phase 3 | Complete |
-| AUTO-03 | Phase 3 | Complete |
-| AUTO-04 | Phase 3 | Complete |
-| AUTO-05 | Phase 3 | Complete |
-| AUTO-06 | Phase 3 | Complete |
-| DASH-01 | Phase 4 | Complete |
-| DASH-02 | Phase 4 | Complete |
-| DASH-03 | Phase 4 | Complete |
-| DASH-04 | Phase 4 | Complete |
-| DASH-05 | Phase 4 | Complete |
-| DASH-06 | Phase 4 | Complete |
+| SEC-01 | Phase 5 | Pending |
+| SEC-02 | Phase 5 | Complete (05-01) |
+| AUTH-01 | Phase 5 | Pending |
+| AUTH-02 | Phase 5 | Complete (05-01) |
+| AUTH-03 | Phase 5 | Complete (05-01) |
+| AUTH-04 | Phase 6 | Pending |
+| AUTH-05 | Phase 6 | Pending |
+| AUTH-06 | Phase 6 | Pending |
+| AUTH-07 | Phase 6 | Pending |
+| AUTH-08 | Phase 6 | Pending |
+| HTTP-01 | Phase 7 | Pending |
+| HTTP-02 | Phase 7 | Pending |
+| HTTP-03 | Phase 7 | Pending |
+| HTTP-04 | Phase 7 | Pending |
+| PATH-01 | Phase 8 | Pending |
+| PATH-02 | Phase 8 | Pending |
 
 **Coverage:**
-- v1 requirements: 34 total
-- Mapped to phases: 34
+- v1.1 requirements: 16 total
+- Mapped to phases: 16
 - Unmapped: 0
 
 ---
-*Requirements defined: 2026-03-07*
-*Traceability updated: 2026-03-08 (02-02)*
+*Requirements defined: 2026-03-09*
+*Last updated: 2026-03-09 — traceability updated with phase mappings*
