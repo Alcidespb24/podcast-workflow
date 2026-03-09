@@ -1,8 +1,12 @@
 /* Toast auto-dismiss and modal close handling */
 
-document.addEventListener("htmx:oobAfterSwap", function (event) {
-    var toasts = event.target.querySelectorAll(".toast");
+document.addEventListener("htmx:oobAfterSwap", function () {
+    var toasts = document.querySelectorAll("#toast-container .toast");
     toasts.forEach(function (toast) {
+        if (toast.getAttribute("data-dismiss-scheduled")) {
+            return;
+        }
+        toast.setAttribute("data-dismiss-scheduled", "true");
         setTimeout(function () {
             toast.classList.add("toast--dismiss");
             setTimeout(function () {
