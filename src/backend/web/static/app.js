@@ -16,6 +16,16 @@ document.addEventListener("htmx:oobAfterSwap", function () {
     });
 });
 
+/* Filter bar: toggle active button on click */
+document.addEventListener("click", function (e) {
+    var btn = e.target.closest(".filter-bar button");
+    if (!btn) return;
+    btn.closest(".filter-bar").querySelectorAll("button").forEach(function (b) {
+        b.className = "secondary outline";
+    });
+    btn.className = "primary";
+});
+
 document.addEventListener("closeModal", function () {
     var dialogs = document.querySelectorAll("dialog[open]");
     dialogs.forEach(function (dialog) {
