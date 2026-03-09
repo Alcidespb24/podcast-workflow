@@ -91,8 +91,8 @@ Markdown → Sanitize → Gemini 2.5 Pro (script) → Chunk → Gemini TTS (audi
 | `EPISODES_DIR` | `episodes` | Local MP3 storage directory |
 | `CROSSFADE_MS` | `30` | Audio crossfade in milliseconds |
 | `TARGET_DBFS` | `-20.0` | RMS normalization target |
-| `DASHBOARD_USERNAME` | `admin` | HTTP Basic Auth username |
-| `DASHBOARD_PASSWORD` | `REDACTED_VALUE` | HTTP Basic Auth password |
+| `DASHBOARD_USERNAME` | `admin` | Dashboard login username |
+| `DASHBOARD_PASSWORD_HASH` | *(required)* | Argon2id hash — generate with `python -m src.hash_password` |
 | `WATCHER_ENABLED` | `true` | Enable file watching |
 | `MAX_RETRIES` | `3` | Job retry limit |
 
