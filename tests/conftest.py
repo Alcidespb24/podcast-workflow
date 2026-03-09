@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
+from argon2 import PasswordHasher
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -12,6 +13,9 @@ from src.backend.web.app import create_app
 from src.config import Settings
 from src.domain.models import Episode, Host, Style
 from src.infrastructure.database.models import Base
+
+_ph = PasswordHasher()
+TEST_HASH = _ph.hash("testpass")
 
 
 @pytest.fixture()
@@ -84,6 +88,7 @@ def tmp_env_file(tmp_path: Path) -> Path:
         "DATABASE_URL=sqlite:///test.db\n"
         "BASE_URL=https://example.com\n"
         "VAULT_OUTPUT_DIR=/tmp/vault\n"
+        f"DASHBOARD_PASSWORD_HASH={TEST_HASH}\n"
     )
     return env_file
 
@@ -100,7 +105,7 @@ def dashboard_settings(tmp_path: Path) -> Settings:
         episodes_dir=str(ep_dir),
         podcast_name="Test Podcast",
         dashboard_username="admin",
-        REDACTED_FIELD="testpass",
+        REDACTED_FIELD_hash=TEST_HASH,
     )
 
 

@@ -1,6 +1,9 @@
 """Application settings loaded from environment variables and .env files."""
 
-from pydantic import field_validator
+import sys
+from typing import Any
+
+from pydantic import ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -34,7 +37,7 @@ class Settings(BaseSettings):
 
     # Phase 4: Web Dashboard
     dashboard_username: str = "admin"
-    REDACTED_FIELD: str = "REDACTED_VALUE"
+    REDACTED_FIELD_hash: str
     dashboard_host: str = "127.0.0.1"
 
     # Phase 3: Automation
@@ -53,3 +56,30 @@ class Settings(BaseSettings):
         if not v.startswith("https://"):
             raise ValueError("base_url must start with https://")
         return v.rstrip("/")
+
+    @field_validator("REDACTED_FIELD_hash")
+    @classmethod
+    def _must_be_argon2id(cls, v: str) -> str:
+        if not v.startswith("$argon2id$"):
+            raise ValueError(
+                "not a valid Argon2id hash (run: python -m src.hash_password)"
+            )
+        return v
+
+
+def load_settings(**kwargs: Any) -> Settings:
+    """Load and validate settings, printing a friendly error checklist on failure.
+
+    Accepts the same keyword arguments as Settings() (e.g. _env_file for testing).
+    """
+    try:
+        return Settings(**kwargs)
+    except ValidationError as e:
+        print("\nConfiguration errors found:\n")
+        for err in e.errors():
+            field_name = str(err["loc"][0])
+            env_var = field_name.upper()
+            msg = err["msg"]
+            print(f"  \u2717 {env_var} \u2014 {msg}")
+        print("\nFix these in your .env file and try again.")
+        sys.exit(1)
