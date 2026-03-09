@@ -1,6 +1,7 @@
 """Tests for database repositories and seed_defaults."""
 
 import pytest
+from argon2 import PasswordHasher
 from sqlalchemy.orm import Session
 
 from src.config import Settings
@@ -11,6 +12,9 @@ from src.infrastructure.database.repositories import (
     StyleRepository,
     seed_defaults,
 )
+
+_ph = PasswordHasher()
+TEST_HASH = _ph.hash("testpass")
 
 
 @pytest.fixture(autouse=True)
@@ -54,6 +58,7 @@ def test_host_get_defaults(db_session: Session) -> None:
         database_url="sqlite:///:memory:",
         base_url="https://example.com",
         vault_output_dir="/tmp/vault",
+        REDACTED_FIELD_hash=TEST_HASH,
     )
     seed_defaults(db_session, settings)
     defaults = repo.get_defaults()
@@ -141,6 +146,7 @@ def test_style_get_defaults(db_session: Session) -> None:
         database_url="sqlite:///:memory:",
         base_url="https://example.com",
         vault_output_dir="/tmp/vault",
+        REDACTED_FIELD_hash=TEST_HASH,
     )
     seed_defaults(db_session, settings)
     defaults = repo.get_defaults()
@@ -188,6 +194,7 @@ def test_seed_defaults_creates_hosts_and_style(db_session: Session) -> None:
         database_url="sqlite:///:memory:",
         base_url="https://example.com",
         vault_output_dir="/tmp/vault",
+        REDACTED_FIELD_hash=TEST_HASH,
     )
     seed_defaults(db_session, settings)
     host_repo = HostRepository(db_session)
@@ -211,6 +218,7 @@ def test_seed_defaults_idempotent(db_session: Session) -> None:
         database_url="sqlite:///:memory:",
         base_url="https://example.com",
         vault_output_dir="/tmp/vault",
+        REDACTED_FIELD_hash=TEST_HASH,
     )
     seed_defaults(db_session, settings)
     seed_defaults(db_session, settings)

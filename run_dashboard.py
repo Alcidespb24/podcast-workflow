@@ -8,13 +8,13 @@ from pathlib import Path
 os.environ.setdefault("BASE_URL", "https://localhost")
 os.environ.setdefault("VAULT_OUTPUT_DIR", ".")
 
-from src.config import Settings
+from src.config import load_settings
 from src.infrastructure.database import create_db_engine, get_session_factory, run_migrations
 from src.infrastructure.database.repositories import EpisodeRepository, seed_defaults
 from src.backend.web.app import create_app
 from src.backend.watcher.service import WatcherService
 
-settings = Settings()
+settings = load_settings()
 
 Path("data").mkdir(exist_ok=True)
 run_migrations(settings.database_url)

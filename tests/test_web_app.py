@@ -4,10 +4,14 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from argon2 import PasswordHasher
 from fastapi.testclient import TestClient
 
 from src.backend.web.app import create_app
 from src.config import Settings
+
+_ph = PasswordHasher()
+TEST_HASH = _ph.hash("testpass")
 
 
 @pytest.fixture()
@@ -29,6 +33,7 @@ def settings(episodes_dir: Path) -> Settings:
         vault_output_dir=str(episodes_dir.parent / "vault"),
         episodes_dir=str(episodes_dir),
         podcast_name="Test Podcast",
+        REDACTED_FIELD_hash=TEST_HASH,
     )
 
 

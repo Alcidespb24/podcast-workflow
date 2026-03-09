@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from argon2 import PasswordHasher
 from pydub import AudioSegment
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -17,6 +18,9 @@ from src.application.podcast_service import (
 from src.config import Settings
 from src.domain.models import Episode, Host, PipelineConfig, Style
 from src.infrastructure.database.models import Base
+
+_ph = PasswordHasher()
+TEST_HASH = _ph.hash("testpass")
 
 
 @pytest.fixture()
@@ -47,6 +51,7 @@ def settings(tmp_path: Path) -> Settings:
         base_url="https://example.com",
         vault_output_dir=str(tmp_path / "vault"),
         episodes_dir=str(tmp_path / "episodes"),
+        REDACTED_FIELD_hash=TEST_HASH,
     )
 
 
