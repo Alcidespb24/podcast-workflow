@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: complete
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-03-08T22:35:11Z"
-last_activity: 2026-03-08 — Phase 4 Plan 3 executed (preset CRUD + episode history)
+status: completed
+stopped_at: Completed 04-04-PLAN.md
+last_updated: "2026-03-09T02:56:53.810Z"
+last_activity: 2026-03-09 — Phase 4 Plan 4 executed (UAT bug fixes: filter duplication + toast dismiss)
 progress:
   total_phases: 4
-  completed_phases: 4
-  total_plans: 15
-  completed_plans: 15
+  completed_phases: 3
+  total_plans: 16
+  completed_plans: 11
   percent: 100
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 4 of 4 (Web Dashboard)
-Plan: 3 of 3 in current phase
+Plan: 4 of 4 in current phase
 Status: Complete
-Last activity: 2026-03-08 — Phase 4 Plan 3 executed (preset CRUD + episode history)
+Last activity: 2026-03-09 — Phase 4 Plan 4 executed (UAT bug fixes: filter duplication + toast dismiss)
 
-Progress: [##########] 100%
+Progress: [███████░░░] 69%
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Progress: [##########] 100%
 | Phase 03 P03 | 5min | 2 tasks | 6 files |
 | Phase 03 P02 | 5 | 2 tasks | 6 files |
 | Phase 03 P01 | 5min | 2 tasks | 9 files |
+| Phase 04 P04 | 2min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -97,6 +98,8 @@ Recent decisions affecting current work:
 - [04-03]: Status filter via query parameter with HTMX partial swap on #episode-list
 - [04-03]: Preset form uses dialog with auto-close on hx-on::after-request
 - [04-03]: Date format uses %b %d (not %-d) for Windows cross-platform compatibility
+- [Phase 04]: HX-Target header check in episodes_page (not _render_page) to keep shared helper generic
+- [Phase 04]: data-dismiss-scheduled attribute to prevent double-scheduling on rapid OOB swaps
 
 ### Pending Todos
 
@@ -108,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-08T22:35:11Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-03-09T02:56:53.807Z
+Stopped at: Completed 04-04-PLAN.md
 Resume file: None
