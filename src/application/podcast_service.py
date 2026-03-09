@@ -182,10 +182,13 @@ def generate_podcast(
         logger.error("RSS feed generation failed (non-fatal): %s", exc)
 
     # 13. Write to Obsidian vault
-    mp3_dest, note_dest = write_episode_to_vault(
-        episode, export_path, script, settings.vault_output_dir
-    )
-    logger.info("Vault output: MP3=%s, Note=%s", mp3_dest, note_dest)
+    try:
+        mp3_dest, note_dest = write_episode_to_vault(
+            episode, export_path, script, settings.vault_output_dir
+        )
+        logger.info("Vault output: MP3=%s, Note=%s", mp3_dest, note_dest)
+    except Exception as exc:
+        logger.warning("Obsidian vault write failed (non-fatal): %s", exc)
 
     # 14. Return Episode
     return episode

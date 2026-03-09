@@ -7,7 +7,7 @@ from pathlib import Path
 from src.application.podcast_service import generate_podcast
 from src.config import Settings
 from src.domain.models import PipelineConfig
-from src.exceptions import AudioWriteError, ConfigurationError, InputError, PodcastError, ScriptGenerationError, TTSError
+from src.exceptions import PodcastError
 from src.infrastructure.database import create_db_engine, get_session_factory, run_migrations
 from src.infrastructure.database.repositories import HostRepository, StyleRepository, seed_defaults
 
@@ -50,32 +50,20 @@ def main() -> None:
                 sys.exit(1)
             style = styles[0]
 
-        # Build pipeline config (one source file at a time for now)
-        config = PipelineConfig(
-            hosts=hosts,
-            style=style,
-            source_file=source_files[0],
-        )
+            # Build pipeline config
+            config = PipelineConfig(
+                hosts=hosts,
+                style=style,
+                source_file=source_files[0],
+            )
 
-        generate_podcast(config, settings, output_file="out.wav")
+            episode = generate_podcast(config, settings, session)
+            logger.info(
+                "Episode created: %s (%s)", episode.title, episode.filename
+            )
 
-    except ConfigurationError as e:
-        logger.error("Configuration error: %s", e)
-        sys.exit(1)
-    except InputError as e:
-        logger.error("Input error: %s", e)
-        sys.exit(1)
-    except ScriptGenerationError as e:
-        logger.error("Script generation error: %s", e)
-        sys.exit(1)
-    except TTSError as e:
-        logger.error("TTS error: %s", e)
-        sys.exit(1)
-    except AudioWriteError as e:
-        logger.error("Audio write error: %s", e)
-        sys.exit(1)
     except PodcastError as e:
-        logger.error("Error: %s", e)
+        logger.error("%s: %s", type(e).__name__, e)
         sys.exit(1)
 
 

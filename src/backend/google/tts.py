@@ -2,9 +2,10 @@
 
 from google import genai
 from google.genai import types
+from google.genai.errors import APIError
 
 from src.domain.models import Host
-from src.exceptions import TTSError
+from src.exceptions import RateLimitError, TTSError
 
 
 class GoogleTTSClient:
@@ -27,6 +28,7 @@ class GoogleTTSClient:
             Raw PCM audio bytes.
 
         Raises:
+            RateLimitError: If the API returns a 429 rate-limit response.
             TTSError: If the API call fails or returns no audio data.
         """
         host_names = " and ".join(h.name for h in hosts)
@@ -57,6 +59,10 @@ class GoogleTTSClient:
                     ),
                 ),
             )
+        except APIError as e:
+            if getattr(e, "code", None) == 429:
+                raise RateLimitError(f"TTS rate-limited: {e}") from e
+            raise TTSError(f"TTS API request failed: {e}") from e
         except Exception as e:
             raise TTSError(f"TTS API request failed: {e}") from e
 
@@ -73,7 +79,13 @@ class GoogleTTSClient:
                 "The input may be too long -- try splitting it into smaller files."
             )
 
-        try:
-            return content.parts[0].inline_data.data
-        except (IndexError, AttributeError) as e:
-            raise TTSError(f"Unexpected TTS API response structure: {e}") from e
+        part = content.parts[0]
+        inline_data = getattr(part, "inline_data", None)
+        if not inline_data or not inline_data.data:
+            raise TTSError(
+                f"TTS response contains no audio data (finish_reason={finish_reason!r})."
+            )
+
+        return inline_data.data
+
+

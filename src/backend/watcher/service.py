@@ -59,15 +59,24 @@ class WatcherService:
 
         self._observer = Observer()
 
+        scheduled = 0
         for preset in presets:
-            # Ensure the watched directory exists
-            os.makedirs(preset.folder_path, exist_ok=True)
+            if not os.path.isdir(preset.folder_path):
+                logger.warning(
+                    "Preset folder does not exist, skipping: %s", preset.folder_path
+                )
+                continue
             handler = DebouncedMarkdownHandler(
                 on_file_ready=self._on_file_ready,
                 debounce_seconds=self._settings.watcher_debounce_seconds,
             )
             self._handlers.append(handler)
             self._observer.schedule(handler, preset.folder_path, recursive=False)
+            scheduled += 1
+
+        if scheduled == 0:
+            logger.warning("No valid preset folders found -- watcher has nothing to watch")
+            return
 
         self._observer.start()
 
@@ -77,7 +86,7 @@ class WatcherService:
         )
         self._processor_thread.start()
 
-        logger.info("Watcher started, monitoring %d folder(s)", len(presets))
+        logger.info("Watcher started, monitoring %d folder(s)", scheduled)
 
     def stop(self) -> None:
         """Signal shutdown and wait for threads to finish."""

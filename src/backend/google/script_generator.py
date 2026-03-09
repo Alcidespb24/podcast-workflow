@@ -1,8 +1,9 @@
 """Google Gemini-based podcast script generator."""
 
 from google import genai
+from google.genai.errors import APIError
 
-from src.exceptions import ScriptGenerationError
+from src.exceptions import RateLimitError, ScriptGenerationError
 
 
 class GoogleScriptGenerator:
@@ -21,6 +22,7 @@ class GoogleScriptGenerator:
             Raw script text from the model.
 
         Raises:
+            RateLimitError: If the API returns a 429 rate-limit response.
             ScriptGenerationError: If the API call fails or returns empty content.
         """
         try:
@@ -28,6 +30,10 @@ class GoogleScriptGenerator:
                 model="gemini-2.5-pro",
                 contents=prompt,
             )
+        except APIError as e:
+            if getattr(e, "code", None) == 429:
+                raise RateLimitError(f"Script generation rate-limited: {e}") from e
+            raise ScriptGenerationError(f"Script generation failed: {e}") from e
         except Exception as e:
             raise ScriptGenerationError(f"Script generation failed: {e}") from e
 
@@ -36,3 +42,5 @@ class GoogleScriptGenerator:
             raise ScriptGenerationError("Script generation returned empty content.")
 
         return text
+
+

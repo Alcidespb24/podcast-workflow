@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import threading
 from collections.abc import Callable
 
@@ -59,6 +60,15 @@ class JobProcessor:
                     processed = True
             except Exception:
                 logger.exception("Unexpected error in job processor loop")
+                # If we have a job reference, mark it failed so it doesn't loop forever
+                if job is not None:
+                    try:
+                        JobRepository(session).mark_failed(
+                            job.id, "Unexpected processor error"
+                        )
+                        session.commit()
+                    except Exception:
+                        logger.exception("Failed to mark job %s as failed", job.id)
             finally:
                 session.close()
 
@@ -78,8 +88,12 @@ class JobProcessor:
             repo = JobRepository(session)
             interrupted = repo.get_interrupted_jobs()
             for job in interrupted:
-                repo.mark_failed(job.id, "interrupted -- will re-queue")  # type: ignore[arg-type]
-                repo.create(Job(source_file=job.source_file, preset_id=job.preset_id))
+                # Reset to PENDING on the same record, preserving retry_count
+                repo.update_state(job.id, JobState.PENDING)
+                logger.info(
+                    "Re-queued interrupted job %d (retry_count=%d)",
+                    job.id, job.retry_count,
+                )
             session.commit()
             if interrupted:
                 logger.info("Recovered %d interrupted job(s)", len(interrupted))
@@ -155,7 +169,6 @@ class JobProcessor:
             )
 
             # Transition through intermediate states to COMPLETE
-            # State machine: PROCESSING -> ENCODING -> PUBLISHING -> COMPLETE
             repo.update_state(job_id, JobState.ENCODING)
             repo.update_state(job_id, JobState.PUBLISHING)
             repo.update_state(job_id, JobState.COMPLETE)
@@ -171,23 +184,35 @@ class JobProcessor:
             repo.increment_retry(job_id)
             repo.mark_failed(job_id, str(exc))
             session.commit()
-            self._cleanup_partial_output(job)
+            self._cleanup_partial_output(config)
             logger.warning("Job %d failed after retries: %s", job_id, exc)
 
         except PodcastError as exc:
             repo.mark_failed(job_id, str(exc))
             session.commit()
-            self._cleanup_partial_output(job)
+            self._cleanup_partial_output(config)
             logger.error("Job %d failed: %s", job_id, exc)
 
     # ------------------------------------------------------------------
     # Helpers
     # ------------------------------------------------------------------
 
-    @staticmethod
-    def _cleanup_partial_output(job: Job) -> None:
-        """Remove partial output for a failed job.
+    def _cleanup_partial_output(self, config: PipelineConfig) -> None:
+        """Remove orphaned MP3 files from a failed job."""
+        from datetime import datetime, timezone
+        from src.domain.models import sanitize_filename
+        from src.infrastructure.reader import read_md_files
+        from src.application.podcast_service import _extract_title
 
-        Currently a no-op: sequential processing means no orphaned files
-        are produced. Placeholder for future episode-metadata-based cleanup.
-        """
+        try:
+            content = read_md_files([config.source_file])
+            title = _extract_title(content, config.source_file)
+            today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            safe_title = sanitize_filename(title)
+            filename = f"{today} - {safe_title}.mp3"
+            path = os.path.join(self._settings.episodes_dir, filename)
+            if os.path.exists(path):
+                os.remove(path)
+                logger.info("Cleaned up partial output: %s", path)
+        except Exception:
+            logger.debug("No partial output to clean up", exc_info=True)
