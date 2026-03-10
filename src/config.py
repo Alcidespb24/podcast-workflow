@@ -44,6 +44,9 @@ class Settings(BaseSettings):
     session_secret_key: str
     session_timeout_hours: float = 168
 
+    # Phase 7: HTTP hardening
+    cors_allowed_origins: str = ""
+
     # Phase 3: Automation
     watcher_enabled: bool = True
     watcher_debounce_seconds: float = 1.5
