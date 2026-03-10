@@ -1,3 +1,17 @@
+/* CSRF token injection -- reads meta tag and sets hx-headers on body */
+(function() {
+    var meta = document.querySelector('meta[name="csrf-token"]');
+    if (meta) {
+        document.body.setAttribute(
+            "hx-headers",
+            JSON.stringify({"X-CSRF-Token": meta.getAttribute("content")})
+        );
+        if (window.htmx) {
+            htmx.process(document.body);
+        }
+    }
+})();
+
 /* Toast auto-dismiss and modal close handling */
 
 document.addEventListener("htmx:oobAfterSwap", function () {

@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
-from src.backend.web.deps import get_db, require_auth
+from src.backend.web.deps import ensure_csrf_token, get_db, require_auth
 from src.domain.models import JobState
 from src.infrastructure.database.repositories import (
     EpisodeRepository,
@@ -39,7 +39,8 @@ def _render_page(request: Request, page: str, extra: dict | None = None) -> HTML
     """Render a full page or HTMX partial depending on request type."""
     templates = request.app.state.templates
     partial = _PAGES[page]
-    context: dict = {"request": request, "active_page": page}
+    csrf_token = ensure_csrf_token(request)
+    context: dict = {"request": request, "active_page": page, "csrf_token": csrf_token}
     if extra:
         context.update(extra)
 

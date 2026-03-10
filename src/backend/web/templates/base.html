@@ -6,6 +6,7 @@
     <title>Podcast Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="{{ url_for('static', path='app.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
 </head>
 <body>
@@ -61,13 +62,12 @@
                  hx-swap="innerHTML">
                 {% include "partials/sidebar_status.html" %}
             </div>
-            <form method="post" action="/logout"
-                  onsubmit="return confirm('Are you sure you want to log out?')">
-                <button type="submit" class="outline secondary"
-                        style="width: 100%; margin-top: 0.5rem;">
-                    Log out
-                </button>
-            </form>
+            <button hx-post="/logout"
+                    hx-confirm="Are you sure you want to log out?"
+                    class="outline secondary"
+                    style="width: 100%; margin-top: 0.5rem;">
+                Log out
+            </button>
         </aside>
         <main id="main-content" class="container">
             {% if content_template %}{% include content_template %}{% else %}{% block content %}{% endblock %}{% endif %}

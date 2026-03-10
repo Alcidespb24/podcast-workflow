@@ -22,6 +22,13 @@ _ph = PasswordHasher()
 VALID_HASH = _ph.hash("testpass")
 
 
+def _get_csrf(client: TestClient) -> str:
+    """Visit /login to generate CSRF token, then read it from test endpoint."""
+    client.get("/login")
+    resp = client.get("/_test/csrf-token")
+    return resp.text
+
+
 @pytest.fixture()
 def settings(tmp_path):
     ep_dir = tmp_path / "episodes"
@@ -50,8 +57,14 @@ def app(settings):
     # Add a test-only route to establish authenticated session
     @application.get("/_test/login")
     def test_login(request: Request):
+        import secrets as _s
         request.session["user"] = "admin"
+        request.session["csrf_token"] = _s.token_hex(32)
         return Response("ok")
+
+    @application.get("/_test/csrf-token")
+    def get_csrf_token(request: Request):
+        return Response(request.session.get("csrf_token", ""))
 
     yield application
     engine.dispose()
@@ -227,9 +240,11 @@ class TestLoginSubmission:
 
     def test_valid_credentials_sets_session_and_redirects(self, auth_client):
         """POST /login with valid credentials sets session and returns 204 with HX-Redirect."""
+        token = _get_csrf(auth_client)
         resp = auth_client.post(
             "/login",
             data={"username": "admin", "password": "testpass"},
+            headers={"X-CSRF-Token": token},
         )
         assert resp.status_code == 204
         assert "HX-Redirect" in resp.headers
@@ -237,27 +252,33 @@ class TestLoginSubmission:
 
     def test_invalid_credentials_returns_error(self, auth_client):
         """POST /login with invalid credentials returns 200 with error message."""
+        token = _get_csrf(auth_client)
         resp = auth_client.post(
             "/login",
             data={"username": "admin", "password": "wrongpass"},
+            headers={"X-CSRF-Token": token},
         )
         assert resp.status_code == 200
         assert "Invalid username or password" in resp.text
 
     def test_next_param_preserved_on_login(self, auth_client):
         """POST /login with ?next=/dashboard/hosts returns HX-Redirect to /dashboard/hosts."""
+        token = _get_csrf(auth_client)
         resp = auth_client.post(
             "/login?next=/dashboard/hosts",
             data={"username": "admin", "password": "testpass"},
+            headers={"X-CSRF-Token": token},
         )
         assert resp.status_code == 204
         assert "/dashboard/hosts" in resp.headers["HX-Redirect"]
 
     def test_open_redirect_prevention(self, auth_client):
         """POST /login with ?next=https://evil.com redirects to /dashboard/episodes."""
+        token = _get_csrf(auth_client)
         resp = auth_client.post(
             "/login?next=https://evil.com",
             data={"username": "admin", "password": "testpass"},
+            headers={"X-CSRF-Token": token},
         )
         assert resp.status_code == 204
         assert "/dashboard/episodes" in resp.headers["HX-Redirect"]
@@ -269,14 +290,16 @@ class TestLogout:
 
     def test_logout_clears_session_and_redirects(self, authed_client):
         """POST /logout clears session and redirects to /login?logged_out=1 (303)."""
-        resp = authed_client.post("/logout")
+        token = authed_client.get("/_test/csrf-token").text
+        resp = authed_client.post("/logout", headers={"X-CSRF-Token": token})
         assert resp.status_code == 303
         assert "/login" in resp.headers["location"]
         assert "logged_out=1" in resp.headers["location"]
 
     def test_logout_invalidates_session(self, authed_client):
         """POST /logout -- subsequent request to /dashboard/hosts is rejected."""
-        authed_client.post("/logout")
+        token = authed_client.get("/_test/csrf-token").text
+        authed_client.post("/logout", headers={"X-CSRF-Token": token})
         resp = authed_client.get("/dashboard/hosts")
         assert resp.status_code == 303
         assert "/login" in resp.headers["location"]
@@ -301,10 +324,10 @@ class TestRootRedirect:
 class TestSidebarLogout:
     """Test logout button is present in sidebar on dashboard pages."""
 
-    def test_sidebar_contains_logout_form(self, authed_client):
-        """GET /dashboard/hosts (authenticated) includes logout form in sidebar."""
+    def test_sidebar_contains_logout_button(self, authed_client):
+        """GET /dashboard/hosts (authenticated) includes HTMX logout button in sidebar."""
         resp = authed_client.get("/dashboard/hosts")
         assert resp.status_code == 200
         body = resp.text
-        assert 'action="/logout"' in body
+        assert 'hx-post="/logout"' in body
         assert "Log out" in body

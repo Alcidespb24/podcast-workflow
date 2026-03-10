@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
-from src.backend.web.deps import get_db, require_auth
+from src.backend.web.deps import get_db, require_auth, require_csrf
 from src.domain.models import Preset
 from src.infrastructure.database.repositories import (
     HostRepository,
@@ -13,7 +13,7 @@ from src.infrastructure.database.repositories import (
 
 router = APIRouter(
     prefix="/dashboard/presets",
-    dependencies=[Depends(require_auth)],
+    dependencies=[Depends(require_auth), Depends(require_csrf)],
 )
 
 
