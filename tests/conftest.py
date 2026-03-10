@@ -127,12 +127,23 @@ def dashboard_client(dashboard_settings: Settings, session_factory) -> TestClien
         session_factory=session_factory,
     )
 
-    # Add a test-only route to establish authenticated session
+    import secrets as _s
+
+    _TEST_CSRF_TOKEN = _s.token_hex(32)
+
+    # Add a test-only route to establish authenticated session with CSRF token
     @app.get("/_test/login")
     def test_login(request: Request):
         request.session["user"] = "admin"
+        request.session["csrf_token"] = _TEST_CSRF_TOKEN
         return Response("ok")
+
+    @app.get("/_test/csrf-token")
+    def get_csrf_token(request: Request):
+        return Response(request.session.get("csrf_token", ""))
 
     client = TestClient(app, follow_redirects=False)
     client.get("/_test/login")  # Sets session cookie on the client
+    # Inject default CSRF header so all POST/PUT/DELETE requests pass CSRF check
+    client.headers["X-CSRF-Token"] = _TEST_CSRF_TOKEN
     return client
