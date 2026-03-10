@@ -24,7 +24,7 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full details.
 **Milestone Goal:** Harden the application for VPS deployment and open-source readiness — eliminate all security vulnerabilities found in audit.
 
 - [x] **Phase 5: Secrets and Configuration Foundation** - Scrub git history, migrate to env-based secrets, implement password hashing infrastructure
-- [ ] **Phase 6: Authentication Overhaul** - Replace HTTP Basic Auth with session-based auth, login/logout pages, session management
+- [x] **Phase 6: Authentication Overhaul** - Replace HTTP Basic Auth with session-based auth, login/logout pages, session management (completed 2026-03-10)
 - [ ] **Phase 7: HTTP Hardening** - Rate limiting, CSRF protection, security headers, CORS policy
 - [ ] **Phase 8: Path Validation** - Prevent path traversal on all file operations and preset folder paths
 
@@ -56,7 +56,7 @@ Plans:
   3. Clicking logout invalidates the session and redirects to the login page; the old session cookie no longer grants access
   4. A session left idle beyond the configured timeout requires re-authentication on the next request
   5. Hitting `/dashboard/status` without a valid session returns 401 (or redirects to login), not the status data
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 06-01-PLAN.md — Session infrastructure: SessionMiddleware, require_auth rewrite, status endpoint auth, test overhaul
@@ -71,7 +71,11 @@ Plans:
   2. Every HTTP response includes X-Content-Type-Options, X-Frame-Options, Referrer-Policy, and Strict-Transport-Security headers
   3. A cross-origin request from an unlisted origin is rejected by CORS policy; a request from a configured origin succeeds
   4. All HTMX-driven POST, PUT, and DELETE operations (host/style/preset CRUD) continue working with CSRF tokens attached via `hx-headers`; a request missing the CSRF token is rejected with 403
-**Plans**: TBD
+**Plans:** 1/2 plans executed
+
+Plans:
+- [ ] 07-01-PLAN.md — Rate limiting, security headers, and CORS policy
+- [ ] 07-02-PLAN.md — CSRF protection with HTMX-compatible header-based tokens
 
 ### Phase 8: Path Validation
 **Goal**: All file system operations are confined to allowed directories, preventing path traversal attacks
@@ -91,6 +95,6 @@ Plans:
 | 3. Automation | v1.0 | 3/3 | Complete | 2026-03-08 |
 | 4. Web Dashboard | v1.0 | 4/4 | Complete | 2026-03-09 |
 | 5. Secrets and Configuration Foundation | v1.1 | 2/2 | Complete | 2026-03-09 |
-| 6. Authentication Overhaul | v1.1 | 2/2 | Complete | 2026-03-10 |
-| 7. HTTP Hardening | v1.1 | 0/0 | Not started | - |
+| 6. Authentication Overhaul | v1.1 | Complete    | 2026-03-10 | 2026-03-10 |
+| 7. HTTP Hardening | 1/2 | In Progress|  | - |
 | 8. Path Validation | v1.1 | 0/0 | Not started | - |

@@ -25,9 +25,9 @@ Requirements for Security Hardening milestone. Each maps to roadmap phases.
 
 ### HTTP Hardening
 
-- [ ] **HTTP-01**: Login endpoint is rate-limited (max 5 attempts per 15 minutes per IP)
-- [ ] **HTTP-02**: Security headers are set on all responses (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, HSTS)
-- [ ] **HTTP-03**: CORS policy restricts origins to configured allowlist
+- [x] **HTTP-01**: Login endpoint is rate-limited (max 5 attempts per 15 minutes per IP)
+- [x] **HTTP-02**: Security headers are set on all responses (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, HSTS)
+- [x] **HTTP-03**: CORS policy restricts origins to configured allowlist
 - [ ] **HTTP-04**: CSRF protection covers all state-changing requests (POST, PUT, DELETE) via header-based tokens compatible with HTMX
 
 ### Path Validation
@@ -88,9 +88,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-06 | Phase 6 | Complete (06-02) |
 | AUTH-07 | Phase 6 | Complete (06-01) |
 | AUTH-08 | Phase 6 | Complete (06-01) |
-| HTTP-01 | Phase 7 | Pending |
-| HTTP-02 | Phase 7 | Pending |
-| HTTP-03 | Phase 7 | Pending |
+| HTTP-01 | Phase 7 | Complete |
+| HTTP-02 | Phase 7 | Complete |
+| HTTP-03 | Phase 7 | Complete |
 | HTTP-04 | Phase 7 | Pending |
 | PATH-01 | Phase 8 | Pending |
 | PATH-02 | Phase 8 | Pending |

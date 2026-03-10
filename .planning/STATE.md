@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Security Hardening
 status: executing
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-03-10T02:30:00Z"
+stopped_at: Phase 7 context gathered
+last_updated: "2026-03-10T03:30:52.849Z"
 last_activity: 2026-03-10 — Completed Plan 06-02 (Login/logout UI, branded login page, sidebar logout button)
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 8
+  total_plans: 4
   completed_plans: 4
   percent: 50
 ---
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 ## Current Position
 
 Phase: 7 of 8 (HTTP Hardening)
-Plan: 0 of 0 (Phase 7 not yet planned)
+Plan: 1 of 2 (Rate limiting, security headers, CORS)
 Status: Executing
 Milestone: v1.1 Security Hardening
-Last activity: 2026-03-10 — Completed Plan 06-02 (Login/logout UI, branded login page, sidebar logout button)
+Last activity: 2026-03-10 — Completed Plan 07-01 (Rate limiting, security headers, CORS)
 
-Progress: [#####░░░░░] 50%
+Progress: [######░░░░] 62%
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ Progress: [#####░░░░░] 50%
 | 05    | 02   | 2min     | 1     | 2     |
 | 06    | 01   | 7min     | 2     | 15    |
 | 06    | 02   | 43min    | 3     | 7     |
+| 07    | 01   | 4min     | 2     | 7     |
 
 *Updated after each plan completion*
 
@@ -65,6 +66,8 @@ All v1.0 decisions documented with outcomes.
 - [06-02] POST /login returns 204 + HX-Redirect header on success (HTMX ignores headers on 3xx)
 - [06-02] Open redirect prevention: only /dashboard/* paths accepted for ?next= parameter
 - [06-02] Standalone login.html template (not extending base.html) for clean unauthenticated experience
+- [07-01] Rate limit check runs before CSRF validation so blocked IPs get 429 without needing valid token
+- [07-01] RSS wildcard CORS handled in SecurityHeadersMiddleware via /feed.xml path check
 
 ### Pending Todos
 
@@ -78,6 +81,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T02:30:00Z
-Stopped at: Completed 06-02-PLAN.md
-Resume file: .planning/phases/07-http-hardening/ (Phase 7 - not yet planned)
+Last session: 2026-03-10T03:47:09Z
+Stopped at: Completed 07-01-PLAN.md
+Resume file: .planning/phases/07-http-hardening/07-01-SUMMARY.md
