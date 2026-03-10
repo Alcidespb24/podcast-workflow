@@ -111,7 +111,7 @@ def dashboard_settings(tmp_path: Path) -> Settings:
         episodes_dir=str(ep_dir),
         podcast_name="Test Podcast",
         dashboard_username="admin",
-        REDACTED_FIELD_hash=TEST_HASH,
+        dashboard_password_hash=TEST_HASH,
         session_secret_key="test-secret-key-for-testing",
     )
 

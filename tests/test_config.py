@@ -86,7 +86,7 @@ class TestStartupValidation:
                 base_url="https://example.com",
                 vault_base_dir=str(vault_base),
                 vault_output_dir=str(vault_output),
-                REDACTED_FIELD_hash="not-a-hash",
+                dashboard_password_hash="not-a-hash",
                 session_secret_key="test-secret",
             )
 
@@ -101,10 +101,10 @@ class TestStartupValidation:
             base_url="https://example.com",
             vault_base_dir=str(vault_base),
             vault_output_dir=str(vault_output),
-            REDACTED_FIELD_hash=TEST_HASH,
+            dashboard_password_hash=TEST_HASH,
             session_secret_key="test-secret",
         )
-        assert settings.REDACTED_FIELD_hash == TEST_HASH
+        assert settings.dashboard_password_hash == TEST_HASH
 
     def test_load_settings_prints_checklist_on_error(
         self, tmp_path, monkeypatch, capsys
@@ -153,7 +153,7 @@ class TestVaultBaseDirValidation:
                 google_api_key="test-key",
                 base_url="https://example.com",
                 vault_output_dir=str(tmp_path / "output"),
-                REDACTED_FIELD_hash=TEST_HASH,
+                dashboard_password_hash=TEST_HASH,
                 session_secret_key="test-secret",
             )
 
@@ -165,7 +165,7 @@ class TestVaultBaseDirValidation:
                 base_url="https://example.com",
                 vault_base_dir=str(tmp_path / "nonexistent"),
                 vault_output_dir=str(tmp_path / "nonexistent" / "output"),
-                REDACTED_FIELD_hash=TEST_HASH,
+                dashboard_password_hash=TEST_HASH,
                 session_secret_key="test-secret",
             )
 
@@ -180,7 +180,7 @@ class TestVaultBaseDirValidation:
             base_url="https://example.com",
             vault_base_dir=str(vault_base),
             vault_output_dir=str(vault_output),
-            REDACTED_FIELD_hash=TEST_HASH,
+            dashboard_password_hash=TEST_HASH,
             session_secret_key="test-secret",
         )
         resolved = str(Path(vault_base).resolve())
@@ -200,7 +200,7 @@ class TestVaultBaseDirValidation:
                 base_url="https://example.com",
                 vault_base_dir=str(vault_base),
                 vault_output_dir=str(other_dir),
-                REDACTED_FIELD_hash=TEST_HASH,
+                dashboard_password_hash=TEST_HASH,
                 session_secret_key="test-secret",
             )
 
@@ -215,7 +215,7 @@ class TestVaultBaseDirValidation:
             base_url="https://example.com",
             vault_base_dir=str(vault_base),
             vault_output_dir=str(vault_output),
-            REDACTED_FIELD_hash=TEST_HASH,
+            dashboard_password_hash=TEST_HASH,
             session_secret_key="test-secret",
         )
         assert settings.vault_base_dir == str(vault_base.resolve())

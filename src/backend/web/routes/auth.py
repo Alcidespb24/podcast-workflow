@@ -88,7 +88,7 @@ def login_submit(
     password_ok = False
     if username_ok:
         try:
-            password_ok = _ph.verify(settings.REDACTED_FIELD_hash, password)
+            password_ok = _ph.verify(settings.dashboard_password_hash, password)
         except (VerifyMismatchError, VerificationError, InvalidHashError):
             password_ok = False
 

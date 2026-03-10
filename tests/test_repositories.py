@@ -59,7 +59,7 @@ def test_host_get_defaults(db_session: Session) -> None:
         base_url="https://example.com",
         vault_base_dir="/tmp",
         vault_output_dir="/tmp/vault",
-        REDACTED_FIELD_hash=TEST_HASH,
+        dashboard_password_hash=TEST_HASH,
         session_secret_key="test-secret",
     )
     seed_defaults(db_session, settings)
@@ -149,7 +149,7 @@ def test_style_get_defaults(db_session: Session) -> None:
         base_url="https://example.com",
         vault_base_dir="/tmp",
         vault_output_dir="/tmp/vault",
-        REDACTED_FIELD_hash=TEST_HASH,
+        dashboard_password_hash=TEST_HASH,
         session_secret_key="test-secret",
     )
     seed_defaults(db_session, settings)
@@ -199,7 +199,7 @@ def test_seed_defaults_creates_hosts_and_style(db_session: Session) -> None:
         base_url="https://example.com",
         vault_base_dir="/tmp",
         vault_output_dir="/tmp/vault",
-        REDACTED_FIELD_hash=TEST_HASH,
+        dashboard_password_hash=TEST_HASH,
         session_secret_key="test-secret",
     )
     seed_defaults(db_session, settings)
@@ -225,7 +225,7 @@ def test_seed_defaults_idempotent(db_session: Session) -> None:
         base_url="https://example.com",
         vault_base_dir="/tmp",
         vault_output_dir="/tmp/vault",
-        REDACTED_FIELD_hash=TEST_HASH,
+        dashboard_password_hash=TEST_HASH,
         session_secret_key="test-secret",
     )
     seed_defaults(db_session, settings)

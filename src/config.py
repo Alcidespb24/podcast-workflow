@@ -38,7 +38,7 @@ class Settings(BaseSettings):
 
     # Phase 4: Web Dashboard
     dashboard_username: str = "admin"
-    REDACTED_FIELD_hash: str
+    dashboard_password_hash: str
     dashboard_host: str = "127.0.0.1"
 
     # Phase 6: Session authentication
@@ -68,7 +68,7 @@ class Settings(BaseSettings):
             raise ValueError("base_url must start with https://")
         return v.rstrip("/")
 
-    @field_validator("REDACTED_FIELD_hash")
+    @field_validator("dashboard_password_hash")
     @classmethod
     def _must_be_argon2id(cls, v: str) -> str:
         if not v.startswith("$argon2id$"):

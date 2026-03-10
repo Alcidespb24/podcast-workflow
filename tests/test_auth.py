@@ -41,7 +41,7 @@ def settings(tmp_path):
         vault_base_dir=str(tmp_path),
         vault_output_dir=str(vault_dir),
         episodes_dir=str(ep_dir),
-        REDACTED_FIELD_hash=VALID_HASH,
+        dashboard_password_hash=VALID_HASH,
         session_secret_key="test-secret-key-for-testing",
     )
 
@@ -104,7 +104,7 @@ class TestSessionConfig:
                 vault_base_dir=str(tmp_path),
                 vault_output_dir=str(vault_dir),
                 episodes_dir=str(ep_dir),
-                REDACTED_FIELD_hash=VALID_HASH,
+                dashboard_password_hash=VALID_HASH,
                 # session_secret_key intentionally omitted
             )
 
@@ -186,7 +186,7 @@ class TestSessionExpiry:
             vault_base_dir=str(tmp_path),
             vault_output_dir=str(vault_dir),
             episodes_dir=str(ep_dir),
-            REDACTED_FIELD_hash=VALID_HASH,
+            dashboard_password_hash=VALID_HASH,
             session_secret_key="test-secret",
             session_timeout_hours=24,
         )
