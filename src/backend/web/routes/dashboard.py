@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 
 from src.backend.web.deps import ensure_csrf_token, get_db, require_auth
 from src.domain.models import JobState
+from src.domain.path_validator import validate_path_within
+from src.exceptions import PathTraversalError
 from src.infrastructure.database.repositories import (
     EpisodeRepository,
     HostRepository,
@@ -143,6 +145,7 @@ def styles_page(request: Request, db: Session = Depends(get_db)):
 @router.get("/presets")
 def presets_page(request: Request, db: Session = Depends(get_db)):
     """Render the presets page with resolved host/style names."""
+    settings = request.app.state.settings
     preset_repo = PresetRepository(db)
     host_repo = HostRepository(db)
     style_repo = StyleRepository(db)
@@ -153,11 +156,17 @@ def presets_page(request: Request, db: Session = Depends(get_db)):
         host_a = host_repo.get_by_id(preset.host_a_id)
         host_b = host_repo.get_by_id(preset.host_b_id)
         style = style_repo.get_by_id(preset.style_id)
+        try:
+            validate_path_within(preset.folder_path, settings.vault_base_dir)
+            path_valid = True
+        except PathTraversalError:
+            path_valid = False
         preset_details.append({
             "preset": preset,
             "host_a_name": host_a.name if host_a else "Unknown",
             "host_b_name": host_b.name if host_b else "Unknown",
             "style_name": style.name if style else "Unknown",
+            "path_valid": path_valid,
         })
 
     return _render_page(request, "presets", extra={"preset_details": preset_details})
