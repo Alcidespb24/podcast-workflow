@@ -4,17 +4,16 @@ Covers: login rate limiting (HTTP-01), security headers (HTTP-02),
         CORS configuration (HTTP-03), RSS CORS wildcard.
 """
 
+import re
 import time
 from unittest.mock import patch
 
 import pytest
 from argon2 import PasswordHasher
-from fastapi import Request
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-from starlette.responses import Response
 
 from src.backend.web.app import create_app
 from src.backend.web.middleware.rate_limit import LoginRateLimiter
@@ -64,6 +63,23 @@ def _make_app(settings):
     factory = sessionmaker(bind=engine)
     app = create_app(settings=settings, session_factory=factory)
     return app, engine
+
+
+def _get_csrf_token(client: TestClient) -> str:
+    """GET /login to establish session with CSRF token, return the token."""
+    resp = client.get("/login")
+    match = re.search(r'csrf-token" content="([^"]+)"', resp.text)
+    assert match, "CSRF token not found in login page"
+    return match.group(1)
+
+
+def _post_login(client: TestClient, csrf_token: str, username: str, password: str):
+    """POST /login with CSRF token header."""
+    return client.post(
+        "/login",
+        data={"username": username, "password": password},
+        headers={"X-CSRF-Token": csrf_token},
+    )
 
 
 # ── Rate Limiter Unit Tests ──
@@ -208,12 +224,14 @@ class TestRateLimitIntegration:
         """After 5 failed logins, 6th returns 429 with error message."""
         app, engine = _make_app(settings)
         client = TestClient(app, follow_redirects=False)
-        for _ in range(5):
-            resp = client.post("/login", data={"username": "admin", "password": "wrong"})
-            assert resp.status_code == 200  # Invalid credentials
+        csrf_token = _get_csrf_token(client)
 
-        # 6th attempt should be rate limited
-        resp = client.post("/login", data={"username": "admin", "password": "wrong"})
+        for i in range(5):
+            resp = _post_login(client, csrf_token, "admin", "wrong")
+            assert resp.status_code == 200, f"attempt {i+1} expected 200, got {resp.status_code}"
+
+        # 6th attempt should be rate limited (before CSRF check)
+        resp = _post_login(client, csrf_token, "admin", "wrong")
         assert resp.status_code == 429
         assert "Too many login attempts" in resp.text
         engine.dispose()
@@ -222,10 +240,13 @@ class TestRateLimitIntegration:
         """Successful login does not consume rate limit counter."""
         app, engine = _make_app(settings)
         client = TestClient(app, follow_redirects=False)
+        csrf_token = _get_csrf_token(client)
+
         # 4 failed attempts
         for _ in range(4):
-            client.post("/login", data={"username": "admin", "password": "wrong"})
+            _post_login(client, csrf_token, "admin", "wrong")
+
         # Successful login
-        resp = client.post("/login", data={"username": "admin", "password": "testpass"})
+        resp = _post_login(client, csrf_token, "admin", "testpass")
         assert resp.status_code == 204
         engine.dispose()
