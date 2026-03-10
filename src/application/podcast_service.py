@@ -25,6 +25,7 @@ from src.infrastructure.sanitizer import sanitize_markdown
 logger = logging.getLogger(__name__)
 
 _H1_RE = re.compile(r"^#\s+(.+)$", re.MULTILINE)
+_HEADING_RE = re.compile(r"^#{1,6}\s+", re.MULTILINE)
 
 
 def _extract_title(content: str, source_file: str) -> str:
@@ -37,10 +38,9 @@ def _extract_title(content: str, source_file: str) -> str:
 
 def _extract_description(clean_content: str, max_length: int = 200) -> str:
     """Extract episode description from sanitized content, truncated at word boundary."""
-    text = clean_content.strip()
+    text = _HEADING_RE.sub("", clean_content).strip()
     if len(text) <= max_length:
         return text
-    # Truncate at last space before max_length to avoid cutting mid-word
     truncated = text[:max_length]
     last_space = truncated.rfind(" ")
     if last_space > 0:
@@ -117,7 +117,9 @@ def generate_podcast(
 
     # 8. Extract episode metadata
     title = _extract_title(content, config.source_file)
-    description = _extract_description(clean_content)
+    with open(config.source_file, encoding="utf-8") as f:
+        raw_content = sanitize_markdown(f.read())
+    description = _extract_description(raw_content)
     episode_number = EpisodeRepository(session).get_next_episode_number()
 
     # 9. Process audio (crossfade + RMS normalization)
