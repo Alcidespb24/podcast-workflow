@@ -6,7 +6,7 @@ from pathlib import Path
 
 # Provide defaults for fields not needed by the dashboard
 os.environ.setdefault("BASE_URL", "https://localhost")
-os.environ.setdefault("VAULT_OUTPUT_DIR", ".")
+# VAULT_OUTPUT_DIR now required in .env (Phase 8 path validation)
 
 from src.config import load_settings
 from src.infrastructure.database import create_db_engine, get_session_factory, run_migrations

@@ -104,9 +104,11 @@ def load_settings(**kwargs: Any) -> Settings:
     except ValidationError as e:
         print("\nConfiguration errors found:\n")
         for err in e.errors():
-            field_name = str(err["loc"][0])
-            env_var = field_name.upper()
-            msg = err["msg"]
-            print(f"  \u2717 {env_var} \u2014 {msg}")
+            if err["loc"]:
+                field_name = str(err["loc"][0])
+                env_var = field_name.upper()
+                print(f"  \u2717 {env_var} \u2014 {err['msg']}")
+            else:
+                print(f"  \u2717 {err['msg']}")
         print("\nFix these in your .env file and try again.")
         sys.exit(1)
