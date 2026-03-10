@@ -32,8 +32,8 @@ Requirements for Security Hardening milestone. Each maps to roadmap phases.
 
 ### Path Validation
 
-- [ ] **PATH-01**: Preset folder paths are validated against a configurable base directory, rejecting traversal attempts
-- [ ] **PATH-02**: All file read/write operations validate paths are within allowed directories
+- [x] **PATH-01**: Preset folder paths are validated against a configurable base directory, rejecting traversal attempts
+- [x] **PATH-02**: All file read/write operations validate paths are within allowed directories
 
 ## Future Requirements
 
@@ -92,8 +92,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HTTP-02 | Phase 7 | Complete |
 | HTTP-03 | Phase 7 | Complete |
 | HTTP-04 | Phase 7 | Complete |
-| PATH-01 | Phase 8 | Pending |
-| PATH-02 | Phase 8 | Pending |
+| PATH-01 | Phase 8 | Complete (08-02) |
+| PATH-02 | Phase 8 | Complete (08-02) |
 
 **Coverage:**
 - v1.1 requirements: 16 total
@@ -102,4 +102,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-10 — AUTH-05, AUTH-06 completed in Plan 06-02*
+*Last updated: 2026-03-10 — PATH-01, PATH-02 completed in Plan 08-02*

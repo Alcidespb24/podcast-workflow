@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 MVP** — Phases 1-4 (shipped 2026-03-09)
-- 🚧 **v1.1 Security Hardening** — Phases 5-8 (in progress)
+- ✅ **v1.1 Security Hardening** — Phases 5-8 (shipped 2026-03-10)
 
 ## Phases
 
@@ -19,14 +19,14 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full details.
 
 </details>
 
-### 🚧 v1.1 Security Hardening (In Progress)
+### ✅ v1.1 Security Hardening (Complete)
 
 **Milestone Goal:** Harden the application for VPS deployment and open-source readiness — eliminate all security vulnerabilities found in audit.
 
 - [x] **Phase 5: Secrets and Configuration Foundation** - Scrub git history, migrate to env-based secrets, implement password hashing infrastructure
 - [x] **Phase 6: Authentication Overhaul** - Replace HTTP Basic Auth with session-based auth, login/logout pages, session management (completed 2026-03-10)
 - [x] **Phase 7: HTTP Hardening** - Rate limiting, CSRF protection, security headers, CORS policy (completed 2026-03-10)
-- [ ] **Phase 8: Path Validation** - Prevent path traversal on all file operations and preset folder paths
+- [x] **Phase 8: Path Validation** - Prevent path traversal on all file operations and preset folder paths (completed 2026-03-10)
 
 ## Phase Details
 
@@ -84,11 +84,11 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Creating or updating a preset with a folder path containing `../` or absolute paths outside the configured base directory is rejected with a clear validation error
   2. Any file read/write operation (episode output, markdown input, audio export) that would resolve outside allowed directories is blocked before touching the filesystem
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 08-01-PLAN.md — Path validator foundation: PathTraversalError, validate_path_within, VAULT_BASE_DIR config, test infrastructure
-- [ ] 08-02-PLAN.md — Wire validation into preset routes, watcher, reader, writer, and UI (inline errors, warning badges)
+- [x] 08-02-PLAN.md — Wire validation into preset routes, watcher, reader, writer, and UI (inline errors, warning badges)
 
 ## Progress
 
@@ -101,4 +101,4 @@ Plans:
 | 5. Secrets and Configuration Foundation | v1.1 | 2/2 | Complete | 2026-03-09 |
 | 6. Authentication Overhaul | v1.1 | Complete    | 2026-03-10 | 2026-03-10 |
 | 7. HTTP Hardening | v1.1 | 2/2 | Complete | 2026-03-10 |
-| 8. Path Validation | v1.1 | 1/2 | In Progress | - |
+| 8. Path Validation | v1.1 | 2/2 | Complete | 2026-03-10 |

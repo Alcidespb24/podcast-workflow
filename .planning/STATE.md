@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Security Hardening
-status: executing
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-03-10T06:02:47Z"
-last_activity: 2026-03-10 — Completed Plan 08-01 (Path validation foundation)
+status: complete
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-03-10T06:11:11Z"
+last_activity: 2026-03-10 — Completed Plan 08-02 (Path validation wiring)
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 8
-  completed_plans: 7
-  percent: 87
+  completed_plans: 8
+  percent: 100
 ---
 
 # Project State
@@ -21,24 +21,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Knowledge notes automatically become listenable podcast episodes with configurable voices and styles
-**Current focus:** v1.1 Security Hardening — Phase 8 in progress, Plan 01 complete
+**Current focus:** v1.1 Security Hardening — Complete
 
 ## Current Position
 
 Phase: 8 of 8 (Path Validation)
-Plan: 1 of 2 (Path validation foundation)
-Status: Executing
+Plan: 2 of 2 (Path validation wiring)
+Status: Complete
 Milestone: v1.1 Security Hardening
-Last activity: 2026-03-10 — Completed Plan 08-01 (Path validation foundation)
+Last activity: 2026-03-10 — Completed Plan 08-02 (Path validation wiring)
 
-Progress: [########░░] 87%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7 (v1.1)
-- Average duration: 10min
-- Total execution time: 70min
+- Total plans completed: 8 (v1.1)
+- Average duration: 9min
+- Total execution time: 75min
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -49,6 +49,7 @@ Progress: [########░░] 87%
 | 07    | 01   | 4min     | 2     | 7     |
 | 07    | 02   | 5min     | 2     | 12    |
 | 08    | 01   | 5min     | 2     | 13    |
+| 08    | 02   | 5min     | 2     | 10    |
 
 *Updated after each plan completion*
 
@@ -75,6 +76,9 @@ All v1.0 decisions documented with outcomes.
 - [08-01] Path containment uses pathlib resolve(strict=False) + is_relative_to for cross-platform safety
 - [08-01] PathTraversalError message is generic; WARNING log includes full paths for security auditing
 - [08-01] VAULT_BASE_DIR field_validator checks directory existence; model_validator checks output containment
+- [08-02] 422 PlainTextResponse for path errors with JS-based inline error injection (no HTMX extensions needed)
+- [08-02] Dialog close guarded by event.detail.successful so 422 keeps dialog open
+- [08-02] vault_base_dir optional (None) in reader/writer for backward compatibility
 
 ### Pending Todos
 
@@ -88,6 +92,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T06:02:47Z
-Stopped at: Completed 08-01-PLAN.md
-Resume file: .planning/phases/08-path-validation/08-01-SUMMARY.md
+Last session: 2026-03-10T06:11:11Z
+Stopped at: Completed 08-02-PLAN.md
+Resume file: .planning/phases/08-path-validation/08-02-SUMMARY.md
