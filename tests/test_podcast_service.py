@@ -45,11 +45,14 @@ def config(hosts: list[Host], style: Style, tmp_path: Path) -> PipelineConfig:
 
 @pytest.fixture()
 def settings(tmp_path: Path) -> Settings:
+    vault_dir = tmp_path / "vault"
+    vault_dir.mkdir(exist_ok=True)
     return Settings(
         google_api_key="test-key",
         database_url="sqlite:///:memory:",
         base_url="https://example.com",
-        vault_output_dir=str(tmp_path / "vault"),
+        vault_base_dir=str(tmp_path),
+        vault_output_dir=str(vault_dir),
         episodes_dir=str(tmp_path / "episodes"),
         REDACTED_FIELD_hash=TEST_HASH,
         session_secret_key="test-secret-key-for-testing",

@@ -1,9 +1,10 @@
 """Application settings loaded from environment variables and .env files."""
 
 import sys
+from pathlib import Path
 from typing import Any
 
-from pydantic import ValidationError, field_validator
+from pydantic import ValidationError, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -47,6 +48,9 @@ class Settings(BaseSettings):
     # Phase 7: HTTP hardening
     cors_allowed_origins: str = ""
 
+    # Phase 8: Path validation
+    vault_base_dir: str
+
     # Phase 3: Automation
     watcher_enabled: bool = True
     watcher_debounce_seconds: float = 1.5
@@ -72,6 +76,22 @@ class Settings(BaseSettings):
                 "not a valid Argon2id hash (run: python -m src.hash_password)"
             )
         return v
+
+    @field_validator("vault_base_dir")
+    @classmethod
+    def _resolve_vault_base_dir(cls, v: str) -> str:
+        resolved = Path(v).resolve(strict=False)
+        if not resolved.is_dir():
+            raise ValueError(f"directory does not exist: {v}")
+        return str(resolved)
+
+    @model_validator(mode="after")
+    def _vault_output_within_base(self) -> "Settings":
+        output = Path(self.vault_output_dir).resolve(strict=False)
+        base = Path(self.vault_base_dir)  # Already resolved by field_validator
+        if not output.is_relative_to(base):
+            raise ValueError("VAULT_OUTPUT_DIR must be within VAULT_BASE_DIR")
+        return self
 
 
 def load_settings(**kwargs: Any) -> Settings:

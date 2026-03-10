@@ -28,10 +28,13 @@ VALID_HASH = _ph.hash("testpass")
 def settings(tmp_path):
     ep_dir = tmp_path / "episodes"
     ep_dir.mkdir()
+    vault_dir = tmp_path / "vault"
+    vault_dir.mkdir()
     return Settings(
         google_api_key="k",
         base_url="https://x.com",
-        vault_output_dir="/tmp",
+        vault_base_dir=str(tmp_path),
+        vault_output_dir=str(vault_dir),
         episodes_dir=str(ep_dir),
         REDACTED_FIELD_hash=VALID_HASH,
         session_secret_key="test-secret-key-for-testing",
@@ -42,10 +45,13 @@ def settings(tmp_path):
 def settings_with_cors(tmp_path):
     ep_dir = tmp_path / "episodes"
     ep_dir.mkdir()
+    vault_dir = tmp_path / "vault"
+    vault_dir.mkdir()
     return Settings(
         google_api_key="k",
         base_url="https://x.com",
-        vault_output_dir="/tmp",
+        vault_base_dir=str(tmp_path),
+        vault_output_dir=str(vault_dir),
         episodes_dir=str(ep_dir),
         REDACTED_FIELD_hash=VALID_HASH,
         session_secret_key="test-secret-key-for-testing",

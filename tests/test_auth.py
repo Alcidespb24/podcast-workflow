@@ -33,10 +33,13 @@ def _get_csrf(client: TestClient) -> str:
 def settings(tmp_path):
     ep_dir = tmp_path / "episodes"
     ep_dir.mkdir()
+    vault_dir = tmp_path / "vault"
+    vault_dir.mkdir()
     return Settings(
         google_api_key="k",
         base_url="https://x.com",
-        vault_output_dir="/tmp",
+        vault_base_dir=str(tmp_path),
+        vault_output_dir=str(vault_dir),
         episodes_dir=str(ep_dir),
         REDACTED_FIELD_hash=VALID_HASH,
         session_secret_key="test-secret-key-for-testing",
@@ -91,12 +94,15 @@ class TestSessionConfig:
         """Settings without SESSION_SECRET_KEY raises ValidationError."""
         ep_dir = tmp_path / "episodes"
         ep_dir.mkdir()
+        vault_dir = tmp_path / "vault"
+        vault_dir.mkdir()
         with pytest.raises(Exception):
             Settings(
                 _env_file="",
                 google_api_key="k",
                 base_url="https://x.com",
-                vault_output_dir="/tmp",
+                vault_base_dir=str(tmp_path),
+                vault_output_dir=str(vault_dir),
                 episodes_dir=str(ep_dir),
                 REDACTED_FIELD_hash=VALID_HASH,
                 # session_secret_key intentionally omitted
@@ -172,10 +178,13 @@ class TestSessionExpiry:
         """SESSION_TIMEOUT_HOURS can be set to a custom value."""
         ep_dir = tmp_path / "episodes"
         ep_dir.mkdir()
+        vault_dir = tmp_path / "vault"
+        vault_dir.mkdir()
         settings = Settings(
             google_api_key="k",
             base_url="https://x.com",
-            vault_output_dir="/tmp",
+            vault_base_dir=str(tmp_path),
+            vault_output_dir=str(vault_dir),
             episodes_dir=str(ep_dir),
             REDACTED_FIELD_hash=VALID_HASH,
             session_secret_key="test-secret",

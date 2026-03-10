@@ -27,10 +27,13 @@ def episodes_dir(tmp_path: Path) -> Path:
 @pytest.fixture()
 def settings(episodes_dir: Path) -> Settings:
     """Create test Settings pointing to temporary episodes directory."""
+    vault_dir = episodes_dir.parent / "vault"
+    vault_dir.mkdir(exist_ok=True)
     return Settings(
         google_api_key="test-key",
         base_url="https://podcast.example.com",
-        vault_output_dir=str(episodes_dir.parent / "vault"),
+        vault_base_dir=str(episodes_dir.parent),
+        vault_output_dir=str(vault_dir),
         episodes_dir=str(episodes_dir),
         podcast_name="Test Podcast",
         REDACTED_FIELD_hash=TEST_HASH,
