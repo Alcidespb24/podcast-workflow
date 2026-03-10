@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Security Hardening
 status: executing
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-03-10T03:48:38.037Z"
-last_activity: 2026-03-10 — Completed Plan 07-01 (Rate limiting, security headers, CORS)
+stopped_at: Completed 08-01-PLAN.md
+last_updated: "2026-03-10T06:02:47Z"
+last_activity: 2026-03-10 — Completed Plan 08-01 (Path validation foundation)
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
-  percent: 62
+  total_plans: 8
+  completed_plans: 7
+  percent: 87
 ---
 
 # Project State
@@ -21,24 +21,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Knowledge notes automatically become listenable podcast episodes with configurable voices and styles
-**Current focus:** v1.1 Security Hardening — Phase 6 complete, ready for Phase 7
+**Current focus:** v1.1 Security Hardening — Phase 8 in progress, Plan 01 complete
 
 ## Current Position
 
-Phase: 7 of 8 (HTTP Hardening)
-Plan: 1 of 2 (Rate limiting, security headers, CORS)
+Phase: 8 of 8 (Path Validation)
+Plan: 1 of 2 (Path validation foundation)
 Status: Executing
 Milestone: v1.1 Security Hardening
-Last activity: 2026-03-10 — Completed Plan 07-01 (Rate limiting, security headers, CORS)
+Last activity: 2026-03-10 — Completed Plan 08-01 (Path validation foundation)
 
-Progress: [######░░░░] 62%
+Progress: [########░░] 87%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4 (v1.1)
-- Average duration: 14min
-- Total execution time: 56min
+- Total plans completed: 7 (v1.1)
+- Average duration: 10min
+- Total execution time: 70min
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -47,9 +47,10 @@ Progress: [######░░░░] 62%
 | 06    | 01   | 7min     | 2     | 15    |
 | 06    | 02   | 43min    | 3     | 7     |
 | 07    | 01   | 4min     | 2     | 7     |
+| 07    | 02   | 5min     | 2     | 12    |
+| 08    | 01   | 5min     | 2     | 13    |
 
 *Updated after each plan completion*
-| Phase 07 P02 | 5min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ All v1.0 decisions documented with outcomes.
 - [07-01] RSS wildcard CORS handled in SecurityHeadersMiddleware via /feed.xml path check
 - [Phase 07]: require_csrf skips safe HTTP methods (GET/HEAD/OPTIONS) for router-level application
 - [Phase 07]: Logout converted to hx-post with hx-confirm for CSRF token delivery via hx-headers
+- [08-01] Path containment uses pathlib resolve(strict=False) + is_relative_to for cross-platform safety
+- [08-01] PathTraversalError message is generic; WARNING log includes full paths for security auditing
+- [08-01] VAULT_BASE_DIR field_validator checks directory existence; model_validator checks output containment
 
 ### Pending Todos
 
@@ -84,6 +88,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T03:48:38.035Z
-Stopped at: Completed 07-02-PLAN.md
-Resume file: None
+Last session: 2026-03-10T06:02:47Z
+Stopped at: Completed 08-01-PLAN.md
+Resume file: .planning/phases/08-path-validation/08-01-SUMMARY.md

@@ -74,8 +74,8 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 07-01-PLAN.md — Rate limiting, security headers, and CORS policy
-- [ ] 07-02-PLAN.md — CSRF protection with HTMX-compatible header-based tokens
+- [x] 07-01-PLAN.md — Rate limiting, security headers, and CORS policy
+- [x] 07-02-PLAN.md — CSRF protection with HTMX-compatible header-based tokens
 
 ### Phase 8: Path Validation
 **Goal**: All file system operations are confined to allowed directories, preventing path traversal attacks
@@ -87,7 +87,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — Path validator foundation: PathTraversalError, validate_path_within, VAULT_BASE_DIR config, test infrastructure
+- [x] 08-01-PLAN.md — Path validator foundation: PathTraversalError, validate_path_within, VAULT_BASE_DIR config, test infrastructure
 - [ ] 08-02-PLAN.md — Wire validation into preset routes, watcher, reader, writer, and UI (inline errors, warning badges)
 
 ## Progress
@@ -100,5 +100,5 @@ Plans:
 | 4. Web Dashboard | v1.0 | 4/4 | Complete | 2026-03-09 |
 | 5. Secrets and Configuration Foundation | v1.1 | 2/2 | Complete | 2026-03-09 |
 | 6. Authentication Overhaul | v1.1 | Complete    | 2026-03-10 | 2026-03-10 |
-| 7. HTTP Hardening | 1/2 | Complete    | 2026-03-10 | - |
-| 8. Path Validation | v1.1 | 0/2 | Planned | - |
+| 7. HTTP Hardening | v1.1 | 2/2 | Complete | 2026-03-10 |
+| 8. Path Validation | v1.1 | 1/2 | In Progress | - |
