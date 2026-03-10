@@ -12,8 +12,12 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import Response
+
+from src.backend.web.middleware.rate_limit import LoginRateLimiter
+from src.backend.web.middleware.security_headers import SecurityHeadersMiddleware
 
 from src.backend.web.routes.api_hosts import router as hosts_router
 from src.backend.web.routes.api_presets import router as presets_router
@@ -22,7 +26,7 @@ from src.backend.web.routes.auth import auth_router
 from src.backend.web.routes.dashboard import router as dashboard_router
 from src.backend.web.routes.dashboard import status_router
 from src.backend.web.routes.rss import router as rss_router
-from src.backend.web.deps import AuthRequired
+from src.backend.web.deps import AuthRequired, CSRFError
 from src.config import Settings
 from src.domain.models import Episode
 
@@ -82,6 +86,37 @@ def create_app(
             response.headers["HX-Redirect"] = login_url
             return response
         return RedirectResponse(login_url, status_code=303)
+
+    # CSRF exception handler -- converts CSRFError into 403 responses
+    @app.exception_handler(CSRFError)
+    async def csrf_error_handler(request: Request, exc: CSRFError):
+        if request.headers.get("HX-Request"):
+            from fastapi.responses import HTMLResponse
+
+            return HTMLResponse(
+                '<div id="toast-container" hx-swap-oob="afterbegin">'
+                '<div class="toast toast--error">'
+                "Request blocked: invalid security token. Please reload the page."
+                "</div></div>",
+                status_code=403,
+            )
+        return Response("Forbidden", status_code=403)
+
+    # CORS middleware -- only when origins are configured (conditional, runs before security headers)
+    if settings.cors_allowed_origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=[o.strip() for o in settings.cors_allowed_origins.split(",")],
+            allow_credentials=True,
+            allow_methods=["GET", "POST", "PUT", "DELETE"],
+            allow_headers=["X-CSRF-Token"],
+        )
+
+    # Security headers middleware -- outermost (added last = runs first in LIFO)
+    app.add_middleware(SecurityHeadersMiddleware)
+
+    # Login rate limiter -- stored on app state for use in auth routes
+    app.state.rate_limiter = LoginRateLimiter()
 
     # Store settings and episode getter on app state for route access
     app.state.settings = settings
