@@ -148,7 +148,7 @@ def dashboard_client(dashboard_settings: Settings, session_factory) -> TestClien
     def get_csrf_token(request: Request):
         return Response(request.session.get("csrf_token", ""))
 
-    client = TestClient(app, follow_redirects=False)
+    client = TestClient(app, base_url="https://testserver", follow_redirects=False)
     client.get("/_test/login")  # Sets session cookie on the client
     # Inject default CSRF header so all POST/PUT/DELETE requests pass CSRF check
     client.headers["X-CSRF-Token"] = _TEST_CSRF_TOKEN

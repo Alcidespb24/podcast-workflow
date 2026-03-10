@@ -76,13 +76,13 @@ def app(settings):
 @pytest.fixture()
 def auth_client(app):
     """Unauthenticated client (no session)."""
-    return TestClient(app, follow_redirects=False)
+    return TestClient(app, base_url="https://testserver", follow_redirects=False)
 
 
 @pytest.fixture()
 def authed_client(app):
     """Client with an authenticated session cookie."""
-    client = TestClient(app, follow_redirects=False)
+    client = TestClient(app, base_url="https://testserver", follow_redirects=False)
     client.get("/_test/login")  # Sets session cookie on the client
     return client
 

@@ -143,7 +143,7 @@ class TestSecurityHeaders:
     def test_security_headers_present(self, settings):
         """GET /login response includes all 5 security headers."""
         app, engine = _make_app(settings)
-        client = TestClient(app, follow_redirects=False)
+        client = TestClient(app, base_url="https://testserver", follow_redirects=False)
         resp = client.get("/login")
         assert resp.status_code == 200
         assert resp.headers["X-Content-Type-Options"] == "nosniff"
@@ -156,7 +156,7 @@ class TestSecurityHeaders:
     def test_csp_header_correct(self, settings):
         """CSP header includes all required directives."""
         app, engine = _make_app(settings)
-        client = TestClient(app, follow_redirects=False)
+        client = TestClient(app, base_url="https://testserver", follow_redirects=False)
         resp = client.get("/login")
         csp = resp.headers["Content-Security-Policy"]
         assert "default-src 'self'" in csp
@@ -176,7 +176,7 @@ class TestCORS:
     def test_cors_no_config_no_header(self, settings):
         """When CORS_ALLOWED_ORIGINS is empty, responses have no ACAO header."""
         app, engine = _make_app(settings)
-        client = TestClient(app, follow_redirects=False)
+        client = TestClient(app, base_url="https://testserver", follow_redirects=False)
         resp = client.get("/login")
         # Security headers middleware should not add ACAO for non-RSS
         assert "Access-Control-Allow-Origin" not in resp.headers
@@ -185,7 +185,7 @@ class TestCORS:
     def test_cors_allows_configured_origin(self, settings_with_cors):
         """When CORS_ALLOWED_ORIGINS set, preflight from that origin returns CORS headers."""
         app, engine = _make_app(settings_with_cors)
-        client = TestClient(app, follow_redirects=False)
+        client = TestClient(app, base_url="https://testserver", follow_redirects=False)
         resp = client.options(
             "/login",
             headers={
@@ -199,7 +199,7 @@ class TestCORS:
     def test_cors_rejects_unlisted_origin(self, settings_with_cors):
         """Preflight from unlisted origin gets no CORS headers."""
         app, engine = _make_app(settings_with_cors)
-        client = TestClient(app, follow_redirects=False)
+        client = TestClient(app, base_url="https://testserver", follow_redirects=False)
         resp = client.options(
             "/login",
             headers={
@@ -214,7 +214,7 @@ class TestCORS:
     def test_rss_cors_wildcard(self, settings):
         """GET /feed.xml always has Access-Control-Allow-Origin: * regardless of CORS config."""
         app, engine = _make_app(settings)
-        client = TestClient(app, follow_redirects=False)
+        client = TestClient(app, base_url="https://testserver", follow_redirects=False)
         resp = client.get("/feed.xml")
         assert resp.headers.get("Access-Control-Allow-Origin") == "*"
         engine.dispose()
@@ -229,7 +229,7 @@ class TestRateLimitIntegration:
     def test_rate_limit_blocks_6th_failed_login(self, settings):
         """After 5 failed logins, 6th returns 429 with error message."""
         app, engine = _make_app(settings)
-        client = TestClient(app, follow_redirects=False)
+        client = TestClient(app, base_url="https://testserver", follow_redirects=False)
         csrf_token = _get_csrf_token(client)
 
         for i in range(5):
@@ -245,7 +245,7 @@ class TestRateLimitIntegration:
     def test_rate_limit_does_not_block_successful_login(self, settings):
         """Successful login does not consume rate limit counter."""
         app, engine = _make_app(settings)
-        client = TestClient(app, follow_redirects=False)
+        client = TestClient(app, base_url="https://testserver", follow_redirects=False)
         csrf_token = _get_csrf_token(client)
 
         # 4 failed attempts

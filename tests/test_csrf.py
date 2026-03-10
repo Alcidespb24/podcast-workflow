@@ -69,13 +69,13 @@ def app(settings):
 @pytest.fixture()
 def client(app):
     """Unauthenticated client."""
-    return TestClient(app, follow_redirects=False)
+    return TestClient(app, base_url="https://testserver", follow_redirects=False)
 
 
 @pytest.fixture()
 def authed_client(app):
     """Client with authenticated session and CSRF token."""
-    c = TestClient(app, follow_redirects=False)
+    c = TestClient(app, base_url="https://testserver", follow_redirects=False)
     c.get("/_test/login")
     return c
 
