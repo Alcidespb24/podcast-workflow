@@ -77,6 +77,12 @@ Markdown → Sanitize → Gemini 2.5 Pro (script) → Chunk → Gemini TTS (audi
   → Crossfade + Normalize → MP3 + ID3 tags → RSS feed → Obsidian vault
 ```
 
+## Automation
+
+The watcher monitors preset folders for new markdown files and processes them automatically. Any tool or bot that drops `.md` files into a watched folder can trigger episode generation.
+
+For example, [OpenClaw](https://github.com/AgenteOcorth/OpenClaw) (a Telegram-connected AI agent) can write research notes to your Obsidian vault throughout the day. Pair that with a scheduled task (cron, Windows Task Scheduler, etc.) that runs the pipeline each morning, and new episodes appear in your RSS feed on autopilot.
+
 ## Episode Frontmatter
 
 Markdown files can include optional YAML frontmatter to override auto-extracted metadata:
