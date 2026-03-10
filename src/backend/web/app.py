@@ -18,6 +18,7 @@ from starlette.responses import Response
 from src.backend.web.routes.api_hosts import router as hosts_router
 from src.backend.web.routes.api_presets import router as presets_router
 from src.backend.web.routes.api_styles import router as styles_router
+from src.backend.web.routes.auth import auth_router
 from src.backend.web.routes.dashboard import router as dashboard_router
 from src.backend.web.routes.dashboard import status_router
 from src.backend.web.routes.rss import router as rss_router
@@ -91,6 +92,9 @@ def create_app(
     # Configure Jinja2 templates
     templates = Jinja2Templates(directory="src/backend/web/templates")
     app.state.templates = templates
+
+    # Auth routes (login, logout, root redirect) -- before mounts to avoid shadowing
+    app.include_router(auth_router)
 
     # Ensure episodes directory exists
     os.makedirs(settings.episodes_dir, exist_ok=True)

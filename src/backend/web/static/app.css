@@ -146,3 +146,49 @@ body > .dashboard-layout {
 .error {
     color: var(--pico-del-color);
 }
+
+/* Login page */
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-hero {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.login-hero img {
+    max-width: 120px;
+    border-radius: var(--pico-border-radius);
+    margin-bottom: 1rem;
+}
+
+.login-hero h2 {
+    margin-bottom: 0;
+}
+
+.login-alert {
+    padding: 0.75rem 1rem;
+    border-radius: var(--pico-border-radius);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.login-alert--error {
+    background: var(--pico-del-color);
+    color: #fff;
+}
+
+.login-alert--success {
+    background: var(--pico-ins-color);
+    color: #fff;
+}
