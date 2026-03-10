@@ -1,14 +1,15 @@
-"""Tests for HTTP Basic Auth password verification using Argon2id hashes.
+"""Tests for session-based authentication using Starlette SessionMiddleware.
 
-Covers: valid credentials, wrong password, wrong username, no credentials,
-        both wrong, and malformed hash resilience.
+Covers: session config fields, unauthenticated redirects, HTMX auth handling,
+        authenticated access, status endpoint auth (AUTH-08), session expiry (AUTH-07),
+        and next URL validation.
 """
-
-import base64
 
 import pytest
 from argon2 import PasswordHasher
+from fastapi import Request
 from fastapi.testclient import TestClient
+from starlette.responses import Response
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -21,12 +22,6 @@ _ph = PasswordHasher()
 VALID_HASH = _ph.hash("testpass")
 
 
-def _basic_auth_header(username: str, password: str) -> dict:
-    """Return an Authorization header dict for HTTP Basic Auth."""
-    token = base64.b64encode(f"{username}:{password}".encode()).decode()
-    return {"Authorization": f"Basic {token}"}
-
-
 @pytest.fixture()
 def settings(tmp_path):
     ep_dir = tmp_path / "episodes"
@@ -37,11 +32,12 @@ def settings(tmp_path):
         vault_output_dir="/tmp",
         episodes_dir=str(ep_dir),
         REDACTED_FIELD_hash=VALID_HASH,
+        session_secret_key="test-secret-key-for-testing",
     )
 
 
 @pytest.fixture()
-def auth_client(settings):
+def app(settings):
     engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
@@ -49,54 +45,149 @@ def auth_client(settings):
     )
     Base.metadata.create_all(engine)
     factory = sessionmaker(bind=engine)
-    app = create_app(settings=settings, session_factory=factory)
-    client = TestClient(app)
-    yield client
+    application = create_app(settings=settings, session_factory=factory)
+
+    # Add a test-only route to establish authenticated session
+    @application.get("/_test/login")
+    def test_login(request: Request):
+        request.session["user"] = "admin"
+        return Response("ok")
+
+    yield application
     engine.dispose()
 
 
-class TestPasswordVerification:
-    """Verify require_auth uses Argon2id hash verification correctly."""
+@pytest.fixture()
+def auth_client(app):
+    """Unauthenticated client (no session)."""
+    return TestClient(app, follow_redirects=False)
 
-    def test_valid_credentials_return_200(self, auth_client):
-        resp = auth_client.get(
-            "/dashboard/hosts", headers=_basic_auth_header("admin", "testpass")
-        )
+
+@pytest.fixture()
+def authed_client(app):
+    """Client with an authenticated session cookie."""
+    client = TestClient(app, follow_redirects=False)
+    client.get("/_test/login")  # Sets session cookie on the client
+    return client
+
+
+class TestSessionConfig:
+    """Test that Settings accepts session configuration fields."""
+
+    def test_session_secret_key_required(self, tmp_path):
+        """Settings without SESSION_SECRET_KEY raises ValidationError."""
+        ep_dir = tmp_path / "episodes"
+        ep_dir.mkdir()
+        with pytest.raises(Exception):
+            Settings(
+                google_api_key="k",
+                base_url="https://x.com",
+                vault_output_dir="/tmp",
+                episodes_dir=str(ep_dir),
+                REDACTED_FIELD_hash=VALID_HASH,
+                # session_secret_key intentionally omitted
+            )
+
+    def test_session_timeout_hours_default(self, settings):
+        """SESSION_TIMEOUT_HOURS defaults to 168 (7 days)."""
+        assert settings.session_timeout_hours == 168
+
+
+class TestSessionAuth:
+    """Test session-based authentication replaces HTTP Basic Auth (AUTH-04)."""
+
+    def test_unauthenticated_dashboard_redirects_to_login(self, auth_client):
+        """Unauthenticated GET /dashboard/hosts returns redirect to /login (303)."""
+        resp = auth_client.get("/dashboard/hosts")
+        assert resp.status_code == 303
+        assert "/login" in resp.headers["location"]
+
+    def test_authenticated_session_allows_access(self, authed_client):
+        """Authenticated session allows access to /dashboard/hosts (200)."""
+        resp = authed_client.get("/dashboard/hosts")
         assert resp.status_code == 200
 
-    def test_wrong_password_returns_401(self, auth_client):
+
+class TestHTMXAuthRedirect:
+    """Test HTMX-specific auth redirect behavior."""
+
+    def test_unauthenticated_htmx_returns_204_with_hx_redirect(self, auth_client):
+        """Unauthenticated HTMX request returns 204 with HX-Redirect header."""
         resp = auth_client.get(
             "/dashboard/hosts",
-            headers=_basic_auth_header("admin", "wrongpassword"),
+            headers={"HX-Request": "true"},
         )
-        assert resp.status_code == 401
+        assert resp.status_code == 204
+        assert "HX-Redirect" in resp.headers
+        assert "/login" in resp.headers["HX-Redirect"]
 
-    def test_wrong_username_returns_401(self, auth_client):
+    def test_htmx_with_current_url_builds_next_param(self, auth_client):
+        """HTMX request with HX-Current-URL builds ?next= from dashboard path."""
         resp = auth_client.get(
             "/dashboard/hosts",
-            headers=_basic_auth_header("baduser", "testpass"),
+            headers={
+                "HX-Request": "true",
+                "HX-Current-URL": "https://localhost/dashboard/styles",
+            },
         )
-        assert resp.status_code == 401
+        assert resp.status_code == 204
+        redirect_url = resp.headers["HX-Redirect"]
+        assert "/login" in redirect_url
+        assert "next=/dashboard/styles" in redirect_url
 
-    def test_no_credentials_returns_401(self, auth_client):
+
+class TestStatusEndpointAuth:
+    """Test /dashboard/status requires authentication (AUTH-08)."""
+
+    def test_unauthenticated_status_redirects_to_login(self, auth_client):
+        """Unauthenticated GET /dashboard/status returns redirect to /login (303)."""
+        resp = auth_client.get("/dashboard/status")
+        assert resp.status_code == 303
+        assert "/login" in resp.headers["location"]
+
+    def test_authenticated_status_returns_200(self, authed_client):
+        """Authenticated session allows access to /dashboard/status (200)."""
+        resp = authed_client.get("/dashboard/status")
+        assert resp.status_code == 200
+
+
+class TestSessionExpiry:
+    """Test session expiry behavior (AUTH-07)."""
+
+    def test_session_timeout_is_configurable(self, tmp_path):
+        """SESSION_TIMEOUT_HOURS can be set to a custom value."""
+        ep_dir = tmp_path / "episodes"
+        ep_dir.mkdir()
+        settings = Settings(
+            google_api_key="k",
+            base_url="https://x.com",
+            vault_output_dir="/tmp",
+            episodes_dir=str(ep_dir),
+            REDACTED_FIELD_hash=VALID_HASH,
+            session_secret_key="test-secret",
+            session_timeout_hours=24,
+        )
+        assert settings.session_timeout_hours == 24
+
+
+class TestNextUrlValidation:
+    """Test that ?next= URL in redirects is safe."""
+
+    def test_dashboard_path_preserved_in_redirect(self, auth_client):
+        """Redirect for /dashboard/hosts includes next=/dashboard/hosts."""
         resp = auth_client.get("/dashboard/hosts")
-        assert resp.status_code == 401
+        assert resp.status_code == 303
+        assert "next=/dashboard/hosts" in resp.headers["location"]
 
-    def test_both_wrong_returns_401(self, auth_client):
+    def test_non_dashboard_path_not_included(self, auth_client):
+        """HTMX request with non-dashboard HX-Current-URL does not include next param."""
         resp = auth_client.get(
             "/dashboard/hosts",
-            headers=_basic_auth_header("baduser", "wrongpass"),
+            headers={
+                "HX-Request": "true",
+                "HX-Current-URL": "https://evil.com/steal",
+            },
         )
-        assert resp.status_code == 401
-
-    def test_malformed_hash_returns_401_not_crash(self, auth_client):
-        """A corrupted/invalid hash in config must return 401, not crash."""
-        # Patch the settings object on the app to have a malformed hash
-        auth_client.app.state.settings.REDACTED_FIELD_hash = (
-            "$argon2id$v=19$CORRUPTED_HASH_DATA"
-        )
-        resp = auth_client.get(
-            "/dashboard/hosts",
-            headers=_basic_auth_header("admin", "testpass"),
-        )
-        assert resp.status_code == 401
+        assert resp.status_code == 204
+        redirect_url = resp.headers["HX-Redirect"]
+        assert "evil.com" not in redirect_url
