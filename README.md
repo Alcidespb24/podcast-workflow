@@ -120,3 +120,7 @@ cover_url: "https://example.com/episode-art.jpg"
 ```bash
 pytest
 ```
+
+## License
+
+[MIT](LICENSE)
