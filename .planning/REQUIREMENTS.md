@@ -78,7 +78,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | Phase 5 | Pending |
+| SEC-01 | Phase 10 | Pending (gap closure) |
 | SEC-02 | Phase 5 | Complete (05-01) |
 | AUTH-01 | Phase 5 | Complete (05-02) |
 | AUTH-02 | Phase 5 | Complete (05-01) |
@@ -102,4 +102,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-10 — PATH-01, PATH-02 completed in Plan 08-02*
+*Last updated: 2026-03-10 — Gap closure phases 9-10 added per milestone audit*

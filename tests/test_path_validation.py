@@ -241,3 +241,60 @@ class TestStartupPresetWarning:
 
         # Should log a warning mentioning the preset and path issue
         assert any("outside vault" in r.message for r in caplog.records)
+
+
+class TestPresetsPagePathBadge:
+    """Tests for path_valid badge rendering on full-page presets load."""
+
+    def test_presets_page_shows_valid_path(
+        self, dashboard_client, session_factory, dashboard_settings
+    ):
+        """Full-page GET /dashboard/presets does NOT show 'Invalid path' for valid preset."""
+        from src.infrastructure.database.models import HostRecord, PresetRecord, StyleRecord
+
+        with session_factory() as session:
+            host_a = HostRecord(name="HostA", voice="Kore", role="host")
+            host_b = HostRecord(name="HostB", voice="Puck", role="co-host")
+            style = StyleRecord(name="TestStyle", tone="informative")
+            session.add_all([host_a, host_b, style])
+            session.flush()
+            # Use a valid path within vault_base_dir
+            valid_folder = Path(dashboard_settings.vault_base_dir) / "notes"
+            valid_folder.mkdir(exist_ok=True)
+            preset = PresetRecord(
+                folder_path=str(valid_folder),
+                host_a_id=host_a.id,
+                host_b_id=host_b.id,
+                style_id=style.id,
+            )
+            session.add(preset)
+            session.commit()
+
+        resp = dashboard_client.get("/dashboard/presets")
+        assert resp.status_code == 200
+        assert "Invalid path" not in resp.text
+
+    def test_presets_page_shows_invalid_badge(
+        self, dashboard_client, session_factory, dashboard_settings
+    ):
+        """Full-page GET /dashboard/presets shows 'Invalid path' badge for out-of-bounds preset."""
+        from src.infrastructure.database.models import HostRecord, PresetRecord, StyleRecord
+
+        with session_factory() as session:
+            host_a = HostRecord(name="HostA2", voice="Kore", role="host")
+            host_b = HostRecord(name="HostB2", voice="Puck", role="co-host")
+            style = StyleRecord(name="TestStyle2", tone="informative")
+            session.add_all([host_a, host_b, style])
+            session.flush()
+            preset = PresetRecord(
+                folder_path="../../../etc",
+                host_a_id=host_a.id,
+                host_b_id=host_b.id,
+                style_id=style.id,
+            )
+            session.add(preset)
+            session.commit()
+
+        resp = dashboard_client.get("/dashboard/presets")
+        assert resp.status_code == 200
+        assert "Invalid path" in resp.text
