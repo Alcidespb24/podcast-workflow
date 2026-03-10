@@ -80,6 +80,7 @@ class TestSessionConfig:
         ep_dir.mkdir()
         with pytest.raises(Exception):
             Settings(
+                _env_file="",
                 google_api_key="k",
                 base_url="https://x.com",
                 vault_output_dir="/tmp",
