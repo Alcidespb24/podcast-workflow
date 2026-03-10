@@ -18,8 +18,8 @@ Requirements for Security Hardening milestone. Each maps to roadmap phases.
 - [x] **AUTH-02**: CLI tool generates password hashes for `.env` configuration
 - [x] **AUTH-03**: App refuses to start if password hash is missing or malformed
 - [x] **AUTH-04**: Session-based auth replaces HTTP Basic Auth with signed cookies
-- [ ] **AUTH-05**: User can log in via a dedicated login page (not browser prompt)
-- [ ] **AUTH-06**: User can log out and session is invalidated
+- [x] **AUTH-05**: User can log in via a dedicated login page (not browser prompt)
+- [x] **AUTH-06**: User can log out and session is invalidated
 - [x] **AUTH-07**: Sessions expire after configurable timeout
 - [x] **AUTH-08**: `/dashboard/status` endpoint requires authentication
 
@@ -84,8 +84,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-02 | Phase 5 | Complete (05-01) |
 | AUTH-03 | Phase 5 | Complete (05-01) |
 | AUTH-04 | Phase 6 | Complete (06-01) |
-| AUTH-05 | Phase 6 | Pending |
-| AUTH-06 | Phase 6 | Pending |
+| AUTH-05 | Phase 6 | Complete (06-02) |
+| AUTH-06 | Phase 6 | Complete (06-02) |
 | AUTH-07 | Phase 6 | Complete (06-01) |
 | AUTH-08 | Phase 6 | Complete (06-01) |
 | HTTP-01 | Phase 7 | Pending |
@@ -102,4 +102,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-10 — AUTH-04, AUTH-07, AUTH-08 completed in Plan 06-01*
+*Last updated: 2026-03-10 — AUTH-05, AUTH-06 completed in Plan 06-02*
