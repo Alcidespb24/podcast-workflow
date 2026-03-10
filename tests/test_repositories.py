@@ -59,6 +59,7 @@ def test_host_get_defaults(db_session: Session) -> None:
         base_url="https://example.com",
         vault_output_dir="/tmp/vault",
         REDACTED_FIELD_hash=TEST_HASH,
+        session_secret_key="test-secret",
     )
     seed_defaults(db_session, settings)
     defaults = repo.get_defaults()
@@ -147,6 +148,7 @@ def test_style_get_defaults(db_session: Session) -> None:
         base_url="https://example.com",
         vault_output_dir="/tmp/vault",
         REDACTED_FIELD_hash=TEST_HASH,
+        session_secret_key="test-secret",
     )
     seed_defaults(db_session, settings)
     defaults = repo.get_defaults()
@@ -195,6 +197,7 @@ def test_seed_defaults_creates_hosts_and_style(db_session: Session) -> None:
         base_url="https://example.com",
         vault_output_dir="/tmp/vault",
         REDACTED_FIELD_hash=TEST_HASH,
+        session_secret_key="test-secret",
     )
     seed_defaults(db_session, settings)
     host_repo = HostRepository(db_session)
@@ -219,6 +222,7 @@ def test_seed_defaults_idempotent(db_session: Session) -> None:
         base_url="https://example.com",
         vault_output_dir="/tmp/vault",
         REDACTED_FIELD_hash=TEST_HASH,
+        session_secret_key="test-secret",
     )
     seed_defaults(db_session, settings)
     seed_defaults(db_session, settings)

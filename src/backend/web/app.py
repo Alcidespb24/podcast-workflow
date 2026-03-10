@@ -7,10 +7,13 @@ from collections.abc import Callable
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING, AsyncIterator
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+from starlette.middleware.sessions import SessionMiddleware
+from starlette.responses import Response
 
 from src.backend.web.routes.api_hosts import router as hosts_router
 from src.backend.web.routes.api_presets import router as presets_router
@@ -18,6 +21,7 @@ from src.backend.web.routes.api_styles import router as styles_router
 from src.backend.web.routes.dashboard import router as dashboard_router
 from src.backend.web.routes.dashboard import status_router
 from src.backend.web.routes.rss import router as rss_router
+from src.backend.web.deps import AuthRequired
 from src.config import Settings
 from src.domain.models import Episode
 
@@ -56,6 +60,27 @@ def create_app(
         Configured FastAPI application instance.
     """
     app = FastAPI(title="Podcast Workflow", lifespan=lifespan)
+
+    # Session middleware -- signed cookie-based sessions
+    app.add_middleware(
+        SessionMiddleware,
+        secret_key=settings.session_secret_key,
+        session_cookie="podcast_session",
+        max_age=int(settings.session_timeout_hours * 3600),
+        same_site="lax",
+        https_only=False,
+        path="/",
+    )
+
+    # Auth exception handler -- converts AuthRequired into redirects
+    @app.exception_handler(AuthRequired)
+    async def auth_required_handler(request: Request, exc: AuthRequired):
+        login_url = f"/login?next={exc.next_url}" if exc.next_url else "/login"
+        if request.headers.get("HX-Request"):
+            response = Response(status_code=204)
+            response.headers["HX-Redirect"] = login_url
+            return response
+        return RedirectResponse(login_url, status_code=303)
 
     # Store settings and episode getter on app state for route access
     app.state.settings = settings

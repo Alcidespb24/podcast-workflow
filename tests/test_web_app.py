@@ -34,6 +34,7 @@ def settings(episodes_dir: Path) -> Settings:
         episodes_dir=str(episodes_dir),
         podcast_name="Test Podcast",
         REDACTED_FIELD_hash=TEST_HASH,
+        session_secret_key="test-secret-key-for-testing",
     )
 
 

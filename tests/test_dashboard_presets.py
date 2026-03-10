@@ -1,7 +1,5 @@
 """Integration tests for preset CRUD dashboard routes."""
 
-import base64
-
 import pytest
 from fastapi.testclient import TestClient
 
@@ -67,10 +65,10 @@ class TestPresetList:
         assert "<!DOCTYPE" not in response.text
 
     def test_preset_list_requires_auth(self, dashboard_client: TestClient):
-        # Remove auth header
-        client = TestClient(dashboard_client.app)
+        client = TestClient(dashboard_client.app, follow_redirects=False)
         response = client.get("/dashboard/presets")
-        assert response.status_code == 401
+        assert response.status_code == 303
+        assert "/login" in response.headers["location"]
 
 
 class TestPresetCreate:
@@ -118,12 +116,13 @@ class TestPresetCreate:
         assert "toast" in response.text
 
     def test_create_preset_requires_auth(self, dashboard_client: TestClient):
-        client = TestClient(dashboard_client.app)
+        client = TestClient(dashboard_client.app, follow_redirects=False)
         response = client.post(
             "/dashboard/presets",
             data={"folder_path": "/vault/x", "host_a_id": "1", "host_b_id": "2", "style_id": "1"},
         )
-        assert response.status_code == 401
+        assert response.status_code == 303
+        assert "/login" in response.headers["location"]
 
 
 class TestPresetNewForm:

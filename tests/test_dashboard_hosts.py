@@ -1,15 +1,10 @@
 """Integration tests for Host CRUD dashboard routes."""
 
-import base64
-
 import pytest
 from fastapi.testclient import TestClient
 
 from src.domain.models import Host
 from src.infrastructure.database.repositories import HostRepository
-
-
-AUTH_HEADER = f"Basic {base64.b64encode(b'admin:testpass').decode('ascii')}"
 
 
 def _seed_host(dashboard_client: TestClient, name: str = "Alice", voice: str = "Kore", role: str = "host") -> None:
@@ -61,11 +56,11 @@ class TestHostList:
         assert "Alice" in response.text
         assert "Bob" in response.text
 
-    def test_returns_401_without_auth(self, dashboard_client: TestClient):
-        # Remove auth header
-        client = TestClient(dashboard_client.app)
+    def test_redirects_to_login_without_auth(self, dashboard_client: TestClient):
+        client = TestClient(dashboard_client.app, follow_redirects=False)
         response = client.get("/dashboard/hosts")
-        assert response.status_code == 401
+        assert response.status_code == 303
+        assert "/login" in response.headers["location"]
 
 
 class TestHostCreate:
@@ -95,12 +90,13 @@ class TestHostCreate:
         assert response.status_code == 422
 
     def test_create_host_requires_auth(self, dashboard_client: TestClient):
-        client = TestClient(dashboard_client.app)
+        client = TestClient(dashboard_client.app, follow_redirects=False)
         response = client.post(
             "/dashboard/hosts",
             data={"name": "NoAuth", "voice": "Kore", "role": "host"},
         )
-        assert response.status_code == 401
+        assert response.status_code == 303
+        assert "/login" in response.headers["location"]
 
 
 class TestHostEdit:

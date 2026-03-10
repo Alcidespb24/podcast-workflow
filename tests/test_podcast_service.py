@@ -52,6 +52,7 @@ def settings(tmp_path: Path) -> Settings:
         vault_output_dir=str(tmp_path / "vault"),
         episodes_dir=str(tmp_path / "episodes"),
         REDACTED_FIELD_hash=TEST_HASH,
+        session_secret_key="test-secret-key-for-testing",
     )
 
 

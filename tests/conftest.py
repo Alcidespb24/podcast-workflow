@@ -1,4 +1,3 @@
-import base64
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -89,6 +88,7 @@ def tmp_env_file(tmp_path: Path) -> Path:
         "BASE_URL=https://example.com\n"
         "VAULT_OUTPUT_DIR=/tmp/vault\n"
         f"DASHBOARD_PASSWORD_HASH={TEST_HASH}\n"
+        "SESSION_SECRET_KEY=test-secret-key-for-testing\n"
     )
     return env_file
 
@@ -106,6 +106,7 @@ def dashboard_settings(tmp_path: Path) -> Settings:
         podcast_name="Test Podcast",
         dashboard_username="admin",
         REDACTED_FIELD_hash=TEST_HASH,
+        session_secret_key="test-secret-key-for-testing",
     )
 
 
@@ -117,12 +118,21 @@ def session_factory(db_engine):
 
 @pytest.fixture()
 def dashboard_client(dashboard_settings: Settings, session_factory) -> TestClient:
-    """Create a TestClient with Basic Auth for dashboard testing."""
+    """Create a TestClient with an authenticated session for dashboard testing."""
+    from fastapi import Request
+    from starlette.responses import Response
+
     app = create_app(
         settings=dashboard_settings,
         session_factory=session_factory,
     )
-    client = TestClient(app)
-    credentials = base64.b64encode(b"admin:testpass").decode("ascii")
-    client.headers["Authorization"] = f"Basic {credentials}"
+
+    # Add a test-only route to establish authenticated session
+    @app.get("/_test/login")
+    def test_login(request: Request):
+        request.session["user"] = "admin"
+        return Response("ok")
+
+    client = TestClient(app, follow_redirects=False)
+    client.get("/_test/login")  # Sets session cookie on the client
     return client

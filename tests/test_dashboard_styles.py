@@ -1,15 +1,10 @@
 """Integration tests for Style CRUD dashboard routes."""
 
-import base64
-
 import pytest
 from fastapi.testclient import TestClient
 
 from src.domain.models import Style
 from src.infrastructure.database.repositories import StyleRepository
-
-
-AUTH_HEADER = f"Basic {base64.b64encode(b'admin:testpass').decode('ascii')}"
 
 
 def _seed_style(
@@ -65,10 +60,11 @@ class TestStyleList:
         assert "Casual" in response.text
         assert "Formal" in response.text
 
-    def test_returns_401_without_auth(self, dashboard_client: TestClient):
-        client = TestClient(dashboard_client.app)
+    def test_redirects_to_login_without_auth(self, dashboard_client: TestClient):
+        client = TestClient(dashboard_client.app, follow_redirects=False)
         response = client.get("/dashboard/styles")
-        assert response.status_code == 401
+        assert response.status_code == 303
+        assert "/login" in response.headers["location"]
 
 
 class TestStyleCreate:
@@ -110,12 +106,13 @@ class TestStyleCreate:
         assert "Guided" in response.text
 
     def test_create_style_requires_auth(self, dashboard_client: TestClient):
-        client = TestClient(dashboard_client.app)
+        client = TestClient(dashboard_client.app, follow_redirects=False)
         response = client.post(
             "/dashboard/styles",
             data={"name": "NoAuth", "tone": "Any", "personality_guidance": ""},
         )
-        assert response.status_code == 401
+        assert response.status_code == 303
+        assert "/login" in response.headers["location"]
 
 
 class TestStyleEdit:

@@ -1,16 +1,26 @@
-"""FastAPI dependencies for dashboard routes: DB session and HTTP Basic Auth."""
+"""FastAPI dependencies for dashboard routes: DB session and session-based auth."""
 
 import secrets
-from typing import Annotated, Generator
+from typing import Generator
+from urllib.parse import urlparse
 
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
-from fastapi import Depends, HTTPException, Request, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi import Request
 from sqlalchemy.orm import Session
 
-security = HTTPBasic()
 _ph = PasswordHasher()
+
+
+class AuthRequired(Exception):
+    """Raised when a request lacks a valid session.
+
+    The exception handler in app.py converts this into a redirect to /login
+    (303 for normal requests, 204 + HX-Redirect for HTMX requests).
+    """
+
+    def __init__(self, next_url: str = ""):
+        self.next_url = next_url
 
 
 def get_db(request: Request) -> Generator[Session, None, None]:
@@ -27,35 +37,31 @@ def get_db(request: Request) -> Generator[Session, None, None]:
         session.close()
 
 
-def require_auth(
-    credentials: Annotated[HTTPBasicCredentials, Depends(security)],
-    request: Request,
-) -> str:
-    """Verify HTTP Basic credentials against dashboard settings.
+def require_auth(request: Request) -> str:
+    """Check session for authenticated user. Raise AuthRequired if missing.
 
-    Returns the username on success; raises 401 on failure.
-    Uses Argon2id hash verification for passwords.
+    For HTMX requests, extracts the current dashboard path from HX-Current-URL
+    to build a ?next= parameter for the login redirect.
+
+    Returns the username on success.
     """
-    settings = request.app.state.settings
-    username_ok = secrets.compare_digest(
-        credentials.username.encode("utf-8"),
-        settings.dashboard_username.encode("utf-8"),
-    )
+    user = request.session.get("user")
+    if user:
+        return user
 
-    password_ok = False
-    if username_ok:
-        try:
-            password_ok = _ph.verify(
-                settings.REDACTED_FIELD_hash,
-                credentials.password,
-            )
-        except (VerifyMismatchError, VerificationError, InvalidHashError):
-            password_ok = False
+    # Determine next_url for redirect back after login
+    next_url = ""
 
-    if not (username_ok and password_ok):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return credentials.username
+    if request.headers.get("HX-Request"):
+        # HTMX request: extract path from HX-Current-URL header
+        current_url = request.headers.get("HX-Current-URL", "")
+        if current_url:
+            parsed = urlparse(current_url)
+            if parsed.path.startswith("/dashboard"):
+                next_url = parsed.path
+    else:
+        # Normal request: use the request path directly
+        if request.url.path.startswith("/dashboard"):
+            next_url = request.url.path
+
+    raise AuthRequired(next_url=next_url)

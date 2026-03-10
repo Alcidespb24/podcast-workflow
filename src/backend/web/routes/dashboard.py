@@ -162,8 +162,8 @@ def presets_page(request: Request, db: Session = Depends(get_db)):
     return _render_page(request, "presets", extra={"preset_details": preset_details})
 
 
-# Status endpoint -- no auth required (HTMX polling from authenticated page)
-status_router = APIRouter(prefix="/dashboard")
+# Status endpoint -- requires session auth (AUTH-08)
+status_router = APIRouter(prefix="/dashboard", dependencies=[Depends(require_auth)])
 
 
 @status_router.get("/status")

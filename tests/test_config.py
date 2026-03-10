@@ -25,6 +25,7 @@ class TestSettings:
             "BASE_URL=https://example.com\n"
             "VAULT_OUTPUT_DIR=/tmp/vault\n"
             f"DASHBOARD_PASSWORD_HASH={TEST_HASH}\n"
+            "SESSION_SECRET_KEY=test-secret\n"
         )
         settings = Settings(_env_file=env_file)
         assert settings.database_url == "sqlite:///data/podcast.db"
@@ -36,6 +37,7 @@ class TestSettings:
             "BASE_URL=https://example.com\n"
             "VAULT_OUTPUT_DIR=/tmp/vault\n"
             f"DASHBOARD_PASSWORD_HASH={TEST_HASH}\n"
+            "SESSION_SECRET_KEY=test-secret\n"
         )
         settings = Settings(_env_file=env_file)
         assert isinstance(settings.default_host_a_name, str)
@@ -64,6 +66,7 @@ class TestStartupValidation:
                 base_url="https://example.com",
                 vault_output_dir="/tmp/vault",
                 REDACTED_FIELD_hash="not-a-hash",
+                session_secret_key="test-secret",
             )
 
     def test_valid_argon2id_hash_accepted(self) -> None:
@@ -73,6 +76,7 @@ class TestStartupValidation:
             base_url="https://example.com",
             vault_output_dir="/tmp/vault",
             REDACTED_FIELD_hash=TEST_HASH,
+            session_secret_key="test-secret",
         )
         assert settings.REDACTED_FIELD_hash == TEST_HASH
 
@@ -100,6 +104,7 @@ class TestStartupValidation:
             "BASE_URL=https://example.com\n"
             "VAULT_OUTPUT_DIR=/tmp/vault\n"
             f"DASHBOARD_PASSWORD_HASH={TEST_HASH}\n"
+            "SESSION_SECRET_KEY=test-secret\n"
         )
         settings = load_settings(_env_file=env_file)
         assert isinstance(settings, Settings)
@@ -115,6 +120,7 @@ class TestEnvExample:
             "BASE_URL",
             "VAULT_OUTPUT_DIR",
             "DASHBOARD_PASSWORD_HASH",
+            "SESSION_SECRET_KEY",
         ]
         for var in required_vars:
             assert var in env_example, f"Missing required var {var} in .env.example"

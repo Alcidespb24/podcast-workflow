@@ -121,9 +121,10 @@ class TestEpisodeList:
         assert "<!DOCTYPE" not in response.text
 
     def test_episode_list_requires_auth(self, dashboard_client: TestClient):
-        client = TestClient(dashboard_client.app)
+        client = TestClient(dashboard_client.app, follow_redirects=False)
         response = client.get("/dashboard/episodes")
-        assert response.status_code == 401
+        assert response.status_code == 303
+        assert "/login" in response.headers["location"]
 
 
 class TestEpisodeStatusFilter:

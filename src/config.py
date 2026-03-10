@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     REDACTED_FIELD_hash: str
     dashboard_host: str = "127.0.0.1"
 
+    # Phase 6: Session authentication
+    session_secret_key: str
+    session_timeout_hours: float = 168
+
     # Phase 3: Automation
     watcher_enabled: bool = True
     watcher_debounce_seconds: float = 1.5
