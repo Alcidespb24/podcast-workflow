@@ -1,15 +1,22 @@
 """Preset CRUD routes for the dashboard."""
 
+import logging
+
 from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
+from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 
 from src.backend.web.deps import get_db, require_auth, require_csrf
 from src.domain.models import Preset
+from src.domain.path_validator import validate_path_within
+from src.exceptions import PathTraversalError
 from src.infrastructure.database.repositories import (
     HostRepository,
     PresetRepository,
     StyleRepository,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/dashboard/presets",
@@ -20,6 +27,7 @@ router = APIRouter(
 def _render_preset_list(request: Request, db: Session, toast_type: str | None = None, toast_message: str | None = None):
     """Render the full preset list table with resolved host/style names."""
     templates = request.app.state.templates
+    settings = request.app.state.settings
     preset_repo = PresetRepository(db)
     host_repo = HostRepository(db)
     style_repo = StyleRepository(db)
@@ -30,11 +38,17 @@ def _render_preset_list(request: Request, db: Session, toast_type: str | None = 
         host_a = host_repo.get_by_id(preset.host_a_id)
         host_b = host_repo.get_by_id(preset.host_b_id)
         style = style_repo.get_by_id(preset.style_id)
+        try:
+            validate_path_within(preset.folder_path, settings.vault_base_dir)
+            path_valid = True
+        except PathTraversalError:
+            path_valid = False
         preset_details.append({
             "preset": preset,
             "host_a_name": host_a.name if host_a else "Unknown",
             "host_b_name": host_b.name if host_b else "Unknown",
             "style_name": style.name if style else "Unknown",
+            "path_valid": path_valid,
         })
 
     context = {"request": request, "preset_details": preset_details}
@@ -105,6 +119,16 @@ def create_preset(
         from fastapi.responses import HTMLResponse
         return HTMLResponse(content=toast_response.body.decode())
 
+    settings = request.app.state.settings
+    try:
+        validate_path_within(folder_path.strip(), settings.vault_base_dir)
+    except PathTraversalError:
+        logger.warning("Path traversal attempt in preset create: %r", folder_path)
+        return PlainTextResponse(
+            "Path must be within the vault directory.",
+            status_code=422,
+        )
+
     preset_repo = PresetRepository(db)
     preset_repo.create(
         Preset(
@@ -156,6 +180,16 @@ def update_preset(
     db: Session = Depends(get_db),
 ):
     """Update an existing preset."""
+    settings = request.app.state.settings
+    try:
+        validate_path_within(folder_path.strip(), settings.vault_base_dir)
+    except PathTraversalError:
+        logger.warning("Path traversal attempt in preset update: %r", folder_path)
+        return PlainTextResponse(
+            "Path must be within the vault directory.",
+            status_code=422,
+        )
+
     preset_repo = PresetRepository(db)
     updated = preset_repo.update(
         preset_id,

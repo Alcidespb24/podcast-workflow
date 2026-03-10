@@ -214,10 +214,11 @@ class TestPresetUpdate:
         assert response.status_code == 200
         assert "toast" in response.text
 
-    def test_update_preset_returns_404_for_missing(self, dashboard_client: TestClient, _seed_hosts_and_styles):
+    def test_update_preset_returns_404_for_missing(self, dashboard_client: TestClient, _seed_hosts_and_styles, dashboard_settings):
+        valid_path = str(Path(dashboard_settings.vault_base_dir) / "x")
         response = dashboard_client.put(
             "/dashboard/presets/999",
-            data={"folder_path": "/vault/x", "host_a_id": "1", "host_b_id": "2", "style_id": "1"},
+            data={"folder_path": valid_path, "host_a_id": "1", "host_b_id": "2", "style_id": "1"},
         )
         assert response.status_code == 404
 

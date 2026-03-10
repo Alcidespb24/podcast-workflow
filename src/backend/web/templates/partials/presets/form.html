@@ -11,12 +11,20 @@
               {% endif %}
               hx-target="#preset-list"
               hx-swap="innerHTML"
-              hx-on::after-request="this.closest('dialog').close(); this.closest('dialog').remove();">
+              hx-on::after-request="
+                  if(event.detail.successful) {
+                      this.closest('dialog').close();
+                      this.closest('dialog').remove();
+                  } else if(event.detail.xhr.status === 422) {
+                      document.getElementById('folder-path-error').innerHTML = event.detail.xhr.responseText;
+                  }
+              ">
 
             <label for="folder_path">Folder Path</label>
             <input type="text" id="folder_path" name="folder_path"
                    value="{{ preset.folder_path if preset else '' }}"
-                   placeholder="/path/to/vault/folder" required>
+                   placeholder="Folder within vault (e.g., Notes/Podcasts)" required>
+            <small id="folder-path-error"></small>
 
             <label for="host_a_id">Host A</label>
             <select id="host_a_id" name="host_a_id" required>

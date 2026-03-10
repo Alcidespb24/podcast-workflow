@@ -1,5 +1,10 @@
 <tr>
-    <td>{{ item.preset.folder_path }}</td>
+    <td>
+        {{ item.preset.folder_path }}
+        {% if not item.path_valid %}
+        <mark style="background: var(--pico-del-color); color: white; font-size: 0.75em; padding: 0.1em 0.4em; border-radius: 4px; margin-left: 0.5em;">Invalid path</mark>
+        {% endif %}
+    </td>
     <td>{{ item.host_a_name }}</td>
     <td>{{ item.host_b_name }}</td>
     <td>{{ item.style_name }}</td>
