@@ -31,6 +31,10 @@ data/*.db
 # Python version
 .python-version
 
+# Local automation
+batch_process.py
+run_batch.bat
+
 # OS files
 Thumbs.db
 .DS_Store
