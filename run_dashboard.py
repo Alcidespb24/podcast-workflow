@@ -4,9 +4,7 @@ import os
 import uvicorn
 from pathlib import Path
 
-# Provide defaults for fields not needed by the dashboard
-os.environ.setdefault("BASE_URL", "https://localhost")
-# VAULT_OUTPUT_DIR now required in .env (Phase 8 path validation)
+# BASE_URL and VAULT_OUTPUT_DIR are required in .env (Phase 8 path validation)
 
 from src.config import load_settings
 from src.infrastructure.database import create_db_engine, get_session_factory, run_migrations
