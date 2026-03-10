@@ -59,7 +59,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Session infrastructure: SessionMiddleware, require_auth rewrite, status endpoint auth, test overhaul
+- [x] 06-01-PLAN.md — Session infrastructure: SessionMiddleware, require_auth rewrite, status endpoint auth, test overhaul
 - [ ] 06-02-PLAN.md — Login/logout UI: branded login page, auth endpoints, sidebar logout button
 
 ### Phase 7: HTTP Hardening
@@ -91,6 +91,6 @@ Plans:
 | 3. Automation | v1.0 | 3/3 | Complete | 2026-03-08 |
 | 4. Web Dashboard | v1.0 | 4/4 | Complete | 2026-03-09 |
 | 5. Secrets and Configuration Foundation | v1.1 | 2/2 | Complete | 2026-03-09 |
-| 6. Authentication Overhaul | v1.1 | 0/2 | Planned | - |
+| 6. Authentication Overhaul | v1.1 | 1/2 | In Progress | - |
 | 7. HTTP Hardening | v1.1 | 0/0 | Not started | - |
 | 8. Path Validation | v1.1 | 0/0 | Not started | - |
