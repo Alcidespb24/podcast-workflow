@@ -81,12 +81,15 @@ def sample_episode() -> Episode:
 @pytest.fixture()
 def tmp_env_file(tmp_path: Path) -> Path:
     """Write a temporary .env file with test configuration."""
+    vault_output = tmp_path / "vault"
+    vault_output.mkdir(exist_ok=True)
     env_file = tmp_path / ".env"
     env_file.write_text(
         "GOOGLE_API_KEY=test-key-123\n"
         "DATABASE_URL=sqlite:///test.db\n"
         "BASE_URL=https://example.com\n"
-        "VAULT_OUTPUT_DIR=/tmp/vault\n"
+        f"VAULT_BASE_DIR={tmp_path}\n"
+        f"VAULT_OUTPUT_DIR={vault_output}\n"
         f"DASHBOARD_PASSWORD_HASH={TEST_HASH}\n"
         "SESSION_SECRET_KEY=test-secret-key-for-testing\n"
     )
@@ -98,10 +101,13 @@ def dashboard_settings(tmp_path: Path) -> Settings:
     """Settings configured for dashboard testing."""
     ep_dir = tmp_path / "episodes"
     ep_dir.mkdir()
+    vault_dir = tmp_path / "vault"
+    vault_dir.mkdir(exist_ok=True)
     return Settings(
         google_api_key="test-key",
         base_url="https://podcast.example.com",
-        vault_output_dir=str(tmp_path / "vault"),
+        vault_base_dir=str(tmp_path),
+        vault_output_dir=str(vault_dir),
         episodes_dir=str(ep_dir),
         podcast_name="Test Podcast",
         dashboard_username="admin",
