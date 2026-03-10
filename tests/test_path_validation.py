@@ -1,13 +1,15 @@
-"""Tests for centralized path containment validator."""
+"""Tests for centralized path containment validator and enforcement points."""
 
+import logging
 import os
 import sys
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from src.domain.path_validator import validate_path_within
-from src.exceptions import PathTraversalError
+from src.exceptions import InputError, PathTraversalError
 
 
 class TestValidatePathWithin:
@@ -74,3 +76,168 @@ class TestValidatePathWithin:
         """Accepts Path objects for both path and base_dir."""
         result = validate_path_within(Path("notes"), tmp_path)
         assert isinstance(result, Path)
+
+
+class TestReaderPathValidation:
+    """Tests for path validation in read_md_files."""
+
+    def test_read_md_files_validates_path(self, tmp_path: Path) -> None:
+        """read_md_files with path outside vault_base_dir raises PathTraversalError."""
+        from src.infrastructure.reader import read_md_files
+
+        with pytest.raises(PathTraversalError):
+            read_md_files(["/etc/passwd"], vault_base_dir=str(tmp_path))
+
+    def test_read_md_files_allows_valid_path(self, tmp_path: Path) -> None:
+        """read_md_files with valid path under vault_base_dir succeeds."""
+        from src.infrastructure.reader import read_md_files
+
+        md_file = tmp_path / "notes" / "test.md"
+        md_file.parent.mkdir(parents=True)
+        md_file.write_text("# Test\nHello world")
+        result = read_md_files([str(md_file)], vault_base_dir=str(tmp_path))
+        assert "Hello world" in result
+
+    def test_read_md_files_without_base_dir_skips_validation(self, tmp_path: Path) -> None:
+        """read_md_files without vault_base_dir does not validate paths."""
+        from src.infrastructure.reader import read_md_files
+
+        md_file = tmp_path / "test.md"
+        md_file.write_text("# Content")
+        # No vault_base_dir passed -- should not raise even if path is "outside"
+        result = read_md_files([str(md_file)])
+        assert "Content" in result
+
+
+class TestWriterPathValidation:
+    """Tests for path validation in write_episode_to_vault."""
+
+    def test_write_episode_validates_vault_output_dir(self, tmp_path: Path, sample_episode) -> None:
+        """write_episode_to_vault with vault_output_dir outside vault_base_dir raises PathTraversalError."""
+        from src.infrastructure.obsidian_writer import write_episode_to_vault
+
+        mp3_file = tmp_path / "source.mp3"
+        mp3_file.write_bytes(b"\x00" * 100)
+
+        with pytest.raises(PathTraversalError):
+            write_episode_to_vault(
+                sample_episode,
+                str(mp3_file),
+                "transcript text",
+                "/completely/outside/vault",
+                vault_base_dir=str(tmp_path),
+            )
+
+    def test_write_episode_allows_valid_vault_output_dir(self, tmp_path: Path, sample_episode) -> None:
+        """write_episode_to_vault with valid vault_output_dir succeeds."""
+        from src.infrastructure.obsidian_writer import write_episode_to_vault
+
+        mp3_file = tmp_path / "source.mp3"
+        mp3_file.write_bytes(b"\x00" * 100)
+        output_dir = tmp_path / "vault_output"
+        output_dir.mkdir()
+
+        mp3_dest, note_dest = write_episode_to_vault(
+            sample_episode,
+            str(mp3_file),
+            "transcript text",
+            str(output_dir),
+            vault_base_dir=str(tmp_path),
+        )
+        assert os.path.exists(mp3_dest)
+        assert os.path.exists(note_dest)
+
+
+class TestWatcherPathValidation:
+    """Tests for path validation in WatcherService.start()."""
+
+    def test_watcher_skips_invalid_preset_path(self, tmp_path: Path, caplog) -> None:
+        """Watcher start() skips presets with folder_path outside vault_base_dir."""
+        from src.backend.watcher.service import WatcherService
+        from src.domain.models import Preset
+
+        vault_dir = tmp_path / "vault"
+        vault_dir.mkdir()
+        settings = MagicMock()
+        settings.vault_base_dir = str(vault_dir)
+
+        invalid_preset = MagicMock(spec=Preset)
+        invalid_preset.id = 1
+        invalid_preset.folder_path = "/definitely/outside/vault"
+
+        mock_session = MagicMock()
+        mock_session_factory = MagicMock(return_value=mock_session)
+
+        with patch(
+            "src.backend.watcher.service.PresetRepository"
+        ) as mock_repo_cls:
+            mock_repo_cls.return_value.get_all.return_value = [invalid_preset]
+            service = WatcherService(settings, mock_session_factory)
+
+            with caplog.at_level(logging.WARNING):
+                service.start()
+
+        assert "outside vault" in caplog.text
+        # Observer should not have been started (no valid folders)
+        assert service._observer is None or not service.is_running
+
+    def test_watcher_schedules_valid_preset_path(self, tmp_path: Path) -> None:
+        """Watcher start() schedules presets with valid folder_path."""
+        from src.backend.watcher.service import WatcherService
+        from src.domain.models import Preset
+
+        valid_folder = tmp_path / "vault" / "notes"
+        valid_folder.mkdir(parents=True)
+        settings = MagicMock()
+        settings.vault_base_dir = str(tmp_path / "vault")
+        settings.watcher_debounce_seconds = 1.5
+
+        valid_preset = MagicMock(spec=Preset)
+        valid_preset.id = 1
+        valid_preset.folder_path = str(valid_folder)
+
+        mock_session = MagicMock()
+        mock_session_factory = MagicMock(return_value=mock_session)
+
+        with patch(
+            "src.backend.watcher.service.PresetRepository"
+        ) as mock_repo_cls:
+            mock_repo_cls.return_value.get_all.return_value = [valid_preset]
+            service = WatcherService(settings, mock_session_factory)
+            service.start()
+
+        assert service.is_running
+        service.stop()
+
+
+class TestStartupPresetWarning:
+    """Tests for startup warning on invalid preset paths."""
+
+    def test_startup_logs_warning_for_invalid_presets(self, tmp_path: Path, caplog) -> None:
+        """Watcher logs WARNING for existing presets with out-of-bounds paths."""
+        from src.backend.watcher.service import WatcherService
+        from src.domain.models import Preset
+
+        vault_dir = tmp_path / "vault"
+        vault_dir.mkdir()
+        settings = MagicMock()
+        settings.vault_base_dir = str(vault_dir)
+
+        bad_preset = MagicMock(spec=Preset)
+        bad_preset.id = 42
+        bad_preset.folder_path = "/etc/shadow"
+
+        mock_session = MagicMock()
+        mock_session_factory = MagicMock(return_value=mock_session)
+
+        with patch(
+            "src.backend.watcher.service.PresetRepository"
+        ) as mock_repo_cls:
+            mock_repo_cls.return_value.get_all.return_value = [bad_preset]
+            service = WatcherService(settings, mock_session_factory)
+
+            with caplog.at_level(logging.WARNING):
+                service.start()
+
+        # Should log a warning mentioning the preset and path issue
+        assert any("outside vault" in r.message for r in caplog.records)
