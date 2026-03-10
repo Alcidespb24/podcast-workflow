@@ -19,6 +19,7 @@ from starlette.responses import Response
 from src.backend.web.middleware.rate_limit import LoginRateLimiter
 from src.backend.web.middleware.security_headers import SecurityHeadersMiddleware
 
+from src.backend.web.routes.api_episodes import router as episodes_api_router
 from src.backend.web.routes.api_hosts import router as hosts_router
 from src.backend.web.routes.api_presets import router as presets_router
 from src.backend.web.routes.api_styles import router as styles_router
@@ -152,6 +153,7 @@ def create_app(
 
     # Include routers
     app.include_router(rss_router)
+    app.include_router(episodes_api_router)
     app.include_router(hosts_router)
     app.include_router(styles_router)
     app.include_router(presets_router)

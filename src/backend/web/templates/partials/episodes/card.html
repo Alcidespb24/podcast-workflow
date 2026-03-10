@@ -37,5 +37,15 @@
             {{ item.date.strftime('%b %d, %Y %I:%M %p') }}
             {% endif %}
         </small>
+        {% if item.type == 'episode' %}
+        <button class="btn-delete"
+                hx-delete="/dashboard/episodes/{{ item.episode.id }}"
+                hx-target="#episode-list"
+                hx-swap="innerHTML"
+                hx-confirm="Delete '{{ item.episode.title }}'? This will also remove it from Spotify on next feed poll."
+                hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'>
+            Delete
+        </button>
+        {% endif %}
     </footer>
 </article>

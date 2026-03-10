@@ -202,6 +202,14 @@ class EpisodeRepository:
             return 1
         return max_num + 1
 
+    def delete(self, episode_id: int) -> bool:
+        record = self._session.get(EpisodeRecord, episode_id)
+        if record is None:
+            return False
+        self._session.delete(record)
+        self._session.flush()
+        return True
+
 
 class PresetRepository:
     """CRUD operations for presets, returning domain models."""
