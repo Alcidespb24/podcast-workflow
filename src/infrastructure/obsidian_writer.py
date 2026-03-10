@@ -4,6 +4,7 @@ import os
 import shutil
 
 from src.domain.models import Episode, sanitize_filename
+from src.domain.path_validator import validate_path_within
 
 
 def write_episode_to_vault(
@@ -11,6 +12,7 @@ def write_episode_to_vault(
     mp3_source_path: str,
     transcript: str,
     vault_output_dir: str,
+    vault_base_dir: str | None = None,
 ) -> tuple[str, str]:
     """Copy MP3 and create a markdown episode note in the Obsidian vault.
 
@@ -26,6 +28,9 @@ def write_episode_to_vault(
     Returns:
         Tuple of (mp3_dest_path, note_dest_path).
     """
+    if vault_base_dir is not None:
+        validate_path_within(vault_output_dir, vault_base_dir)
+
     # Build date-prefixed base name with sanitized title
     date_str = episode.published_at.strftime("%Y-%m-%d")
     safe_title = sanitize_filename(episode.title)

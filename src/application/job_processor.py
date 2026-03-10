@@ -205,7 +205,7 @@ class JobProcessor:
         from src.application.podcast_service import _extract_title
 
         try:
-            content = read_md_files([config.source_file])
+            content = read_md_files([config.source_file], vault_base_dir=self._settings.vault_base_dir)
             title = _extract_title(content, config.source_file)
             today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
             safe_title = sanitize_filename(title)

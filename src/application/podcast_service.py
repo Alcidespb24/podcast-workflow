@@ -82,7 +82,7 @@ def generate_podcast(
     host_names = [h.name for h in config.hosts]
 
     # 1. Read source content
-    content = read_md_files([config.source_file])
+    content = read_md_files([config.source_file], vault_base_dir=settings.vault_base_dir)
 
     # 2. Sanitize markdown
     clean_content = sanitize_markdown(content)
@@ -184,7 +184,8 @@ def generate_podcast(
     # 13. Write to Obsidian vault
     try:
         mp3_dest, note_dest = write_episode_to_vault(
-            episode, export_path, script, settings.vault_output_dir
+            episode, export_path, script, settings.vault_output_dir,
+            vault_base_dir=settings.vault_base_dir,
         )
         logger.info("Vault output: MP3=%s, Note=%s", mp3_dest, note_dest)
     except Exception as exc:

@@ -15,6 +15,8 @@ from src.application.job_processor import JobProcessor
 from src.backend.watcher.handler import DebouncedMarkdownHandler
 from src.config import Settings
 from src.domain.models import Job
+from src.domain.path_validator import validate_path_within
+from src.exceptions import PathTraversalError
 from src.infrastructure.database.repositories import JobRepository, PresetRepository
 
 logger = logging.getLogger(__name__)
@@ -61,6 +63,14 @@ class WatcherService:
 
         scheduled = 0
         for preset in presets:
+            try:
+                validate_path_within(preset.folder_path, self._settings.vault_base_dir)
+            except PathTraversalError:
+                logger.warning(
+                    "Preset %d has folder_path outside vault, skipping: %s",
+                    preset.id, preset.folder_path,
+                )
+                continue
             if not os.path.isdir(preset.folder_path):
                 logger.warning(
                     "Preset folder does not exist, skipping: %s", preset.folder_path
