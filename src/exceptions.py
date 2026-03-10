@@ -34,6 +34,10 @@ class WatcherError(PodcastError):
     """File watcher or job processor failure."""
 
 
+class PathTraversalError(PodcastError):
+    """File path resolves outside allowed directory boundaries."""
+
+
 class RateLimitError(PodcastError):
     """API returned 429 rate-limit response."""
 
