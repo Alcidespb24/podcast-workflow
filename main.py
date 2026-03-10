@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 from src.application.podcast_service import generate_podcast
-from src.config import Settings
+from src.config import load_settings
 from src.domain.models import PipelineConfig
 from src.exceptions import PodcastError
 from src.infrastructure.database import create_db_engine, get_session_factory, run_migrations
@@ -22,9 +22,9 @@ def main() -> None:
         print("Usage: python main.py file1.md [file2.md ...]")
         sys.exit(1)
 
-    try:
-        settings = Settings()
+    settings = load_settings()
 
+    try:
         # Database setup
         Path("data").mkdir(exist_ok=True)
         run_migrations(settings.database_url)

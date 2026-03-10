@@ -160,7 +160,7 @@ class TestSecurityHeaders:
         resp = client.get("/login")
         csp = resp.headers["Content-Security-Policy"]
         assert "default-src 'self'" in csp
-        assert "script-src 'self' cdn.jsdelivr.net" in csp
+        assert "script-src 'self' 'unsafe-inline' cdn.jsdelivr.net" in csp
         assert "style-src 'self' cdn.jsdelivr.net" in csp
         assert "img-src 'self' data: https:" in csp
         assert "connect-src 'self'" in csp

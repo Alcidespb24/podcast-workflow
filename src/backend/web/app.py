@@ -73,7 +73,7 @@ def create_app(
         session_cookie="podcast_session",
         max_age=int(settings.session_timeout_hours * 3600),
         same_site="lax",
-        https_only=False,
+        https_only=settings.base_url.startswith("https"),
         path="/",
     )
 
