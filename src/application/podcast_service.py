@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from src.backend.google.script_generator import GoogleScriptGenerator
 from src.backend.google.tts import GoogleTTSClient
 from src.config import Settings
-from src.domain.models import Episode, PipelineConfig, sanitize_filename
+from src.domain.models import Episode, PipelineConfig, slugify_filename
 from src.domain.prompt_builder import build_script_prompt
 from src.exceptions import RSSError
 from src.infrastructure.audio import export_tagged_mp3, process_audio
@@ -132,8 +132,8 @@ def generate_podcast(
 
     # 10. Export tagged MP3
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    safe_title = sanitize_filename(title)
-    filename = f"{today} - {safe_title}.mp3"
+    safe_title = slugify_filename(title)
+    filename = f"{today}-{safe_title}.mp3"
     os.makedirs(settings.episodes_dir, exist_ok=True)
     export_path = os.path.join(settings.episodes_dir, filename)
 

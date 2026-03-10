@@ -7,7 +7,9 @@ from datetime import datetime
 from pydantic import BaseModel, Field, field_validator
 
 _ILLEGAL_FILENAME_CHARS = re.compile(r'[<>:"/\\|?*]')
-_TRAILING_DOTS_SPACES = re.compile(r'[. ]+$')
+_TRAILING_DOTS_SPACES = re.compile(r"[. ]+$")
+_NON_ALNUM = re.compile(r"[^a-z0-9]+")
+_LEADING_TRAILING_HYPHENS = re.compile(r"^-+|-+$")
 
 
 def sanitize_filename(name: str, max_length: int = 200) -> str:
@@ -16,6 +18,13 @@ def sanitize_filename(name: str, max_length: int = 200) -> str:
     cleaned = cleaned[:max_length]
     cleaned = _TRAILING_DOTS_SPACES.sub("", cleaned)
     return cleaned
+
+
+def slugify_filename(name: str, max_length: int = 200) -> str:
+    """Convert a title into a URL-safe slug (lowercase, hyphens, no special chars)."""
+    slug = _NON_ALNUM.sub("-", name.lower())
+    slug = _LEADING_TRAILING_HYPHENS.sub("", slug)
+    return slug[:max_length]
 
 
 class Host(BaseModel):

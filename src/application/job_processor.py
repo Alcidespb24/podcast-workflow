@@ -200,7 +200,7 @@ class JobProcessor:
     def _cleanup_partial_output(self, config: PipelineConfig) -> None:
         """Remove orphaned MP3 files from a failed job."""
         from datetime import datetime, timezone
-        from src.domain.models import sanitize_filename
+        from src.domain.models import slugify_filename
         from src.infrastructure.reader import read_md_files
         from src.application.podcast_service import _extract_title
 
@@ -208,8 +208,8 @@ class JobProcessor:
             content = read_md_files([config.source_file], vault_base_dir=self._settings.vault_base_dir)
             title = _extract_title(content, config.source_file)
             today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-            safe_title = sanitize_filename(title)
-            filename = f"{today} - {safe_title}.mp3"
+            safe_title = slugify_filename(title)
+            filename = f"{today}-{safe_title}.mp3"
             path = os.path.join(self._settings.episodes_dir, filename)
             if os.path.exists(path):
                 os.remove(path)

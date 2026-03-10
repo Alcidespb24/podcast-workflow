@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from src.domain.models import Episode, sanitize_filename
+from src.domain.models import Episode, sanitize_filename, slugify_filename
 from src.infrastructure.database.repositories import EpisodeRepository
 
 
@@ -47,6 +47,23 @@ class TestSanitizeFilename:
 
     def test_preserves_valid_chars(self) -> None:
         assert sanitize_filename("my-podcast_episode 01") == "my-podcast_episode 01"
+
+
+class TestSlugifyFilename:
+    """slugify_filename produces URL-safe slugs for MP3 serving."""
+
+    def test_lowercases_and_hyphenates(self) -> None:
+        assert slugify_filename("My Podcast Episode 01") == "my-podcast-episode-01"
+
+    def test_strips_special_chars(self) -> None:
+        assert slugify_filename("BioLLM & Organoid Intelligence") == "biollm-organoid-intelligence"
+
+    def test_strips_leading_trailing_hyphens(self) -> None:
+        assert slugify_filename("  Hello World  ") == "hello-world"
+
+    def test_limits_length(self) -> None:
+        result = slugify_filename("a" * 300, max_length=200)
+        assert len(result) == 200
 
 
 # -- EpisodeRepository tests --
