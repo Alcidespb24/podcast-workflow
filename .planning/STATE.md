@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Security Hardening
 status: executing
-stopped_at: Phase 7 context gathered
-last_updated: "2026-03-10T03:30:52.849Z"
-last_activity: 2026-03-10 — Completed Plan 06-02 (Login/logout UI, branded login page, sidebar logout button)
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-03-10T03:48:38.037Z"
+last_activity: 2026-03-10 — Completed Plan 07-01 (Rate limiting, security headers, CORS)
 progress:
   total_phases: 4
-  completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
-  percent: 50
+  completed_phases: 3
+  total_plans: 6
+  completed_plans: 6
+  percent: 62
 ---
 
 # Project State
@@ -49,6 +49,7 @@ Progress: [######░░░░] 62%
 | 07    | 01   | 4min     | 2     | 7     |
 
 *Updated after each plan completion*
+| Phase 07 P02 | 5min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ All v1.0 decisions documented with outcomes.
 - [06-02] Standalone login.html template (not extending base.html) for clean unauthenticated experience
 - [07-01] Rate limit check runs before CSRF validation so blocked IPs get 429 without needing valid token
 - [07-01] RSS wildcard CORS handled in SecurityHeadersMiddleware via /feed.xml path check
+- [Phase 07]: require_csrf skips safe HTTP methods (GET/HEAD/OPTIONS) for router-level application
+- [Phase 07]: Logout converted to hx-post with hx-confirm for CSRF token delivery via hx-headers
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T03:47:09Z
-Stopped at: Completed 07-01-PLAN.md
-Resume file: .planning/phases/07-http-hardening/07-01-SUMMARY.md
+Last session: 2026-03-10T03:48:38.035Z
+Stopped at: Completed 07-02-PLAN.md
+Resume file: None
