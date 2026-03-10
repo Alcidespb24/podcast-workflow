@@ -295,3 +295,15 @@ class TestRootRedirect:
         resp = authed_client.get("/")
         assert resp.status_code == 303
         assert "/dashboard/episodes" in resp.headers["location"]
+
+
+class TestSidebarLogout:
+    """Test logout button is present in sidebar on dashboard pages."""
+
+    def test_sidebar_contains_logout_form(self, authed_client):
+        """GET /dashboard/hosts (authenticated) includes logout form in sidebar."""
+        resp = authed_client.get("/dashboard/hosts")
+        assert resp.status_code == 200
+        body = resp.text
+        assert 'action="/logout"' in body
+        assert "Log out" in body
