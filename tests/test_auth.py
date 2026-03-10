@@ -191,3 +191,107 @@ class TestNextUrlValidation:
         assert resp.status_code == 204
         redirect_url = resp.headers["HX-Redirect"]
         assert "evil.com" not in redirect_url
+
+
+# ── Plan 06-02: Login / Logout / Root Redirect ──
+
+
+class TestLoginPage:
+    """Test GET /login renders the login form."""
+
+    def test_login_page_returns_200_with_form(self, auth_client):
+        """GET /login returns 200 with HTML containing login form."""
+        resp = auth_client.get("/login")
+        assert resp.status_code == 200
+        body = resp.text
+        assert "username" in body
+        assert "password" in body
+        assert "Sign in" in body
+
+    def test_login_page_redirects_authenticated_user(self, authed_client):
+        """GET /login when already authenticated redirects to /dashboard/episodes (303)."""
+        resp = authed_client.get("/login")
+        assert resp.status_code == 303
+        assert "/dashboard/episodes" in resp.headers["location"]
+
+    def test_login_page_shows_logged_out_message(self, auth_client):
+        """GET /login?logged_out=1 shows 'You've been logged out' message."""
+        resp = auth_client.get("/login?logged_out=1")
+        assert resp.status_code == 200
+        assert "logged out" in resp.text.lower()
+
+
+class TestLoginSubmission:
+    """Test POST /login authentication flow."""
+
+    def test_valid_credentials_sets_session_and_redirects(self, auth_client):
+        """POST /login with valid credentials sets session and returns 204 with HX-Redirect."""
+        resp = auth_client.post(
+            "/login",
+            data={"username": "admin", "password": "testpass"},
+        )
+        assert resp.status_code == 204
+        assert "HX-Redirect" in resp.headers
+        assert "/dashboard/episodes" in resp.headers["HX-Redirect"]
+
+    def test_invalid_credentials_returns_error(self, auth_client):
+        """POST /login with invalid credentials returns 200 with error message."""
+        resp = auth_client.post(
+            "/login",
+            data={"username": "admin", "password": "wrongpass"},
+        )
+        assert resp.status_code == 200
+        assert "Invalid username or password" in resp.text
+
+    def test_next_param_preserved_on_login(self, auth_client):
+        """POST /login with ?next=/dashboard/hosts returns HX-Redirect to /dashboard/hosts."""
+        resp = auth_client.post(
+            "/login?next=/dashboard/hosts",
+            data={"username": "admin", "password": "testpass"},
+        )
+        assert resp.status_code == 204
+        assert "/dashboard/hosts" in resp.headers["HX-Redirect"]
+
+    def test_open_redirect_prevention(self, auth_client):
+        """POST /login with ?next=https://evil.com redirects to /dashboard/episodes."""
+        resp = auth_client.post(
+            "/login?next=https://evil.com",
+            data={"username": "admin", "password": "testpass"},
+        )
+        assert resp.status_code == 204
+        assert "/dashboard/episodes" in resp.headers["HX-Redirect"]
+        assert "evil.com" not in resp.headers["HX-Redirect"]
+
+
+class TestLogout:
+    """Test POST /logout session invalidation."""
+
+    def test_logout_clears_session_and_redirects(self, authed_client):
+        """POST /logout clears session and redirects to /login?logged_out=1 (303)."""
+        resp = authed_client.post("/logout")
+        assert resp.status_code == 303
+        assert "/login" in resp.headers["location"]
+        assert "logged_out=1" in resp.headers["location"]
+
+    def test_logout_invalidates_session(self, authed_client):
+        """POST /logout -- subsequent request to /dashboard/hosts is rejected."""
+        authed_client.post("/logout")
+        resp = authed_client.get("/dashboard/hosts")
+        assert resp.status_code == 303
+        assert "/login" in resp.headers["location"]
+
+
+class TestRootRedirect:
+    """Test GET / redirects based on auth state."""
+
+    def test_root_unauthenticated_redirects_to_login(self, auth_client):
+        """GET / redirects to /login (303) when unauthenticated."""
+        resp = auth_client.get("/")
+        assert resp.status_code == 303
+        assert "/login" in resp.headers["location"]
+
+    def test_root_authenticated_redirects_to_dashboard(self, authed_client):
+        """GET / redirects to /dashboard/episodes (303) when authenticated."""
+        resp = authed_client.get("/")
+        assert resp.status_code == 303
+        assert "/dashboard/episodes" in resp.headers["location"]
