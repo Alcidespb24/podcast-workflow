@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Security Hardening
-status: in_progress
-stopped_at: Gap closure phases added
-last_updated: "2026-03-10T15:05:00.000Z"
-last_activity: 2026-03-10 — Added gap closure phases 9-10 per milestone audit
+status: completed
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-03-10T15:57:40.044Z"
+last_activity: "2026-03-10 — Completed 09-01: Security & integration polish"
 progress:
   total_phases: 6
-  completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
+  completed_phases: 5
+  total_plans: 9
+  completed_plans: 9
   percent: 80
 ---
 
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 ## Current Position
 
 Phase: 9 of 10 (Security & Integration Polish)
-Plan: 0 of 0 (needs planning)
-Status: Not started
+Plan: 1 of 1
+Status: Phase complete
 Milestone: v1.1 Security Hardening
-Last activity: 2026-03-10 — Added gap closure phases 9-10 per milestone audit
+Last activity: 2026-03-10 — Completed 09-01: Security & integration polish
 
 Progress: [########--] 80%
 
@@ -52,6 +52,7 @@ Progress: [########--] 80%
 | 08    | 02   | 5min     | 2     | 10    |
 
 *Updated after each plan completion*
+| Phase 09 P01 | 8min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,7 @@ All v1.0 decisions documented with outcomes.
 - [08-02] 422 PlainTextResponse for path errors with JS-based inline error injection (no HTMX extensions needed)
 - [08-02] Dialog close guarded by event.detail.successful so 422 keeps dialog open
 - [08-02] vault_base_dir optional (None) in reader/writer for backward compatibility
+- [Phase 09]: TestClient uses base_url='https://testserver' to support secure (https_only) session cookies in all test suites
 
 ### Pending Todos
 
@@ -92,6 +94,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T06:11:11Z
-Stopped at: Completed 08-02-PLAN.md
-Resume file: .planning/phases/08-path-validation/08-02-SUMMARY.md
+Last session: 2026-03-10T15:57:40.041Z
+Stopped at: Completed 09-01-PLAN.md
+Resume file: None

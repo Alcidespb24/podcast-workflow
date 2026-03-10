@@ -9,7 +9,7 @@ Requirements for Security Hardening milestone. Each maps to roadmap phases.
 
 ### Secrets & History
 
-- [ ] **SEC-01**: Git history is scrubbed of all committed secrets (.env, API keys) before open-source release
+- [x] **SEC-01**: Git history is scrubbed of all committed secrets (.env, API keys) before open-source release
 - [x] **SEC-02**: `.env.example` ships with placeholder values documenting all required env vars
 
 ### Authentication
