@@ -163,6 +163,7 @@ class EpisodeRepository:
             style_name=record.style_name,
             source_file=record.source_file,
             published_at=record.published_at,
+            cover_url=record.cover_url,
         )
 
     def create(self, episode: Episode) -> Episode:
@@ -177,6 +178,7 @@ class EpisodeRepository:
             style_name=episode.style_name,
             source_file=episode.source_file,
             published_at=episode.published_at,
+            cover_url=episode.cover_url,
         )
         self._session.add(record)
         self._session.flush()

@@ -75,6 +75,7 @@ class Episode(BaseModel):
     style_name: str
     source_file: str
     published_at: datetime
+    cover_url: str = ""
 
     @property
     def duration_str(self) -> str:

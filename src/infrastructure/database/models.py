@@ -43,6 +43,7 @@ class EpisodeRecord(Base):
     hosts_json: Mapped[str] = mapped_column(Text, nullable=False)
     style_name: Mapped[str] = mapped_column(String(100), nullable=False)
     source_file: Mapped[str] = mapped_column(String(500), nullable=False)
+    cover_url: Mapped[str] = mapped_column(String(500), nullable=False, server_default="", default="")
     published_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False
     )

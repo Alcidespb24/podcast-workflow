@@ -3,6 +3,7 @@
 import logging
 import os
 import re
+import yaml
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -26,6 +27,19 @@ logger = logging.getLogger(__name__)
 
 _H1_RE = re.compile(r"^#\s+(.+)$", re.MULTILINE)
 _HEADING_RE = re.compile(r"^#{1,6}\s+", re.MULTILINE)
+_FRONTMATTER_RE = re.compile(r"^---\n(.*?\n)---\n?", re.DOTALL)
+
+
+def _extract_frontmatter(raw_content: str) -> dict:
+    """Parse YAML frontmatter from raw markdown, returning an empty dict if absent."""
+    match = _FRONTMATTER_RE.match(raw_content)
+    if not match:
+        return {}
+    try:
+        data = yaml.safe_load(match.group(1))
+        return data if isinstance(data, dict) else {}
+    except yaml.YAMLError:
+        return {}
 
 
 def _extract_title(content: str, source_file: str) -> str:
@@ -115,11 +129,13 @@ def generate_podcast(
         logger.info("Synthesizing chunk %d/%d...", i, len(chunks))
         audio_segments.append(tts.synthesize(chunk, config.hosts))
 
-    # 8. Extract episode metadata
-    title = _extract_title(content, config.source_file)
+    # 8. Extract episode metadata (frontmatter overrides auto-extracted values)
     with open(config.source_file, encoding="utf-8") as f:
-        raw_content = sanitize_markdown(f.read())
-    description = _extract_description(raw_content)
+        raw_file = f.read()
+    frontmatter = _extract_frontmatter(raw_file)
+    title = frontmatter.get("title") or _extract_title(content, config.source_file)
+    description = frontmatter.get("description") or _extract_description(sanitize_markdown(raw_file))
+    cover_url = frontmatter.get("cover_url", "")
     episode_number = EpisodeRepository(session).get_next_episode_number()
 
     # 9. Process audio (crossfade + RMS normalization)
@@ -158,6 +174,7 @@ def generate_podcast(
         style_name=config.style.name,
         source_file=config.source_file,
         published_at=datetime.now(timezone.utc),
+        cover_url=cover_url,
     )
     repo = EpisodeRepository(session)
     episode = repo.create(episode)
@@ -168,9 +185,11 @@ def generate_podcast(
         all_episodes = repo.get_all()
         feed_xml = build_podcast_feed(
             settings.podcast_name,
-            f"{settings.podcast_name} - auto-generated podcast feed",
+            settings.podcast_description or settings.podcast_name,
             settings.base_url,
             all_episodes,
+            email=settings.podcast_email,
+            cover_url=settings.podcast_cover_url,
         )
         validation_errors = validate_podcast_rss(feed_xml)
         if validation_errors:

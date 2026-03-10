@@ -28,6 +28,7 @@ class Settings(BaseSettings):
 
     # Phase 2: Audio processing and distribution
     podcast_name: str = "My Knowledge Podcast"
+    podcast_description: str = ""
     podcast_email: str = ""
     podcast_cover_url: str = ""
     base_url: str

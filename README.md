@@ -77,6 +77,24 @@ Markdown → Sanitize → Gemini 2.5 Pro (script) → Chunk → Gemini TTS (audi
   → Crossfade + Normalize → MP3 + ID3 tags → RSS feed → Obsidian vault
 ```
 
+## Episode Frontmatter
+
+Markdown files can include optional YAML frontmatter to override auto-extracted metadata:
+
+```yaml
+---
+title: "Custom Episode Title"
+description: "A concise summary for podcast apps like Spotify."
+cover_url: "https://example.com/episode-art.jpg"
+---
+```
+
+| Field | Fallback |
+|---|---|
+| `title` | First H1 heading, then filename |
+| `description` | First 200 chars of sanitized content |
+| `cover_url` | Channel-level cover art |
+
 ## Configuration
 
 | Setting | Default | Description |
@@ -86,6 +104,7 @@ Markdown → Sanitize → Gemini 2.5 Pro (script) → Chunk → Gemini TTS (audi
 | `VAULT_OUTPUT_DIR` | *(required)* | Obsidian vault output path |
 | `DATABASE_URL` | `sqlite:///data/podcast.db` | SQLite database path |
 | `PODCAST_NAME` | `My Knowledge Podcast` | RSS channel title |
+| `PODCAST_DESCRIPTION` | | RSS channel description |
 | `PODCAST_EMAIL` | | Owner email for RSS feed |
 | `PODCAST_COVER_URL` | | Cover art URL for RSS feed |
 | `EPISODES_DIR` | `episodes` | Local MP3 storage directory |

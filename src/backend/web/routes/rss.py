@@ -20,7 +20,7 @@ def get_feed(request: Request) -> Response:
 
     xml = build_podcast_feed(
         podcast_title=settings.podcast_name,
-        podcast_description=f"{settings.podcast_name} - auto-generated podcast feed",
+        podcast_description=settings.podcast_description or settings.podcast_name,
         base_url=settings.base_url,
         episodes=episodes,
         email=settings.podcast_email,

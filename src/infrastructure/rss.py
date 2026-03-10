@@ -80,6 +80,8 @@ def build_podcast_feed(
             entry.podcast.itunes_duration(ep.duration_str)
             entry.podcast.itunes_episode(ep.episode_number)
             entry.podcast.itunes_episode_type("full")
+            if getattr(ep, "cover_url", ""):
+                entry.podcast.itunes_image(ep.cover_url)
 
         return fg.rss_str(pretty=True).decode("utf-8")
     except Exception as exc:
